@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.kotlin"
-version = "1.0.0"
+version = "0.1.0"
 
 kotlin {
     jvm()
@@ -17,7 +17,6 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
-        withJava() // enable java compilation support
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
@@ -55,10 +54,10 @@ mavenPublishing {
     coordinates(group.toString(), "library", version.toString())
 
     pom {
-        name = "My library"
+        name = "TreeLayoutKMP"
         description = "A library."
-        inceptionYear = "2024"
-        url = "https://github.com/kotlin/multiplatform-library-template/"
+        inceptionYear = "2026"
+        url = "https://github.com/linde9821/TreeLayoutKMP"
         licenses {
             license {
                 name = "XXX"
