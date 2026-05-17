@@ -1,19 +1,146 @@
-[![official project](http://jb.gg/badges/official.svg)](https://github.com/JetBrains#jetbrains-on-github)
+# TreeLayoutKMP
 
-# Multiplatform library template
+![Tree Layout KMP Visualization Example](images/tree_layout.png)
 
-## What is it?
+A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android, or iOS frameworks required.
 
-This repository contains a simple library project, intended to demonstrate a [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) library that is deployable to [Maven Central](https://central.sonatype.com/).
+TreeLayoutKMP works with *any* tree structure you already have. You provide a thin adapter describing how to traverse your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
 
-The library has only one function: generate the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_sequence) starting from platform-provided numbers. Also, it has a test for each platform just to be sure that tests run.
+## Supported Targets
 
-Note that no other actions or tools usually required for the library development are set up, such as [tracking of backwards compatibility](https://kotlinlang.org/docs/jvm-api-guidelines-backward-compatibility.html#tools-designed-to-enforce-backward-compatibility), explicit API mode, licensing, contribution guideline, code of conduct and others. You can find a guide for best practices for designing Kotlin libraries [here](https://kotlinlang.org/docs/api-guidelines-introduction.html).
+| JVM | Android | iOS | Linux x64 |
+|:---:|:-------:|:---:|:---------:|
+| ✅  |   ✅    | ✅  |    ✅     |
 
-## Guide
+## Installation
 
-Please find the detailed guide [here](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html).
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("io.github.kotlin:library:0.1.0")
+}
+```
 
-# Other resources
-* [Publishing via the Central Portal](https://central.sonatype.org/publish-ea/publish-ea-guide/)
-* [Gradle Maven Publish Plugin \- Publishing to Maven Central](https://vanniktech.github.io/gradle-maven-publish-plugin/central/)
+## Quickstart
+
+### 1. Implement `TreeAdapter<T>`
+
+The library is decoupled from any specific tree representation through the `TreeAdapter<T>` interface. This design means you never need to convert your domain model into a library-specific node class — you simply describe how to navigate it.
+
+```kotlin
+import io.github.linde9821.treelayout.TreeAdapter
+
+// Your existing domain model — no modifications needed.
+data class OrgNode(
+    val name: String,
+    val reports: List<OrgNode> = emptyList(),
+    val manager: OrgNode? = null,
+)
+
+// Adapter bridges your model to the layout engine.
+class OrgTreeAdapter(private val rootNode: OrgNode) : TreeAdapter<OrgNode> {
+    override fun root(): OrgNode = rootNode
+    override fun children(node: OrgNode): List<OrgNode> = node.reports
+    override fun parent(node: OrgNode): OrgNode? = node.manager
+}
+```
+
+> **Why an adapter pattern?**  
+> Tree structures vary wildly across domains — file systems, ASTs, org charts, UI component trees. Rather than forcing you to wrap every node in a library class, `TreeAdapter<T>` lets the layout engine traverse your data in-place. This keeps allocations minimal and avoids coupling your domain layer to a visualization concern.
+
+### 2. Run the Layout
+
+```kotlin
+import io.github.linde9821.treelayout.WalkerTreeLayout
+import io.github.linde9821.treelayout.WalkerLayoutConfiguration
+
+// Build your tree
+val ceo = OrgNode("CEO", reports = listOf(
+    OrgNode("VP Engineering", reports = listOf(
+        OrgNode("Team Lead A"),
+        OrgNode("Team Lead B"),
+    )),
+    OrgNode("VP Design"),
+))
+
+// Configure spacing (optional — defaults to 1.0 for both axes)
+val config = WalkerLayoutConfiguration(
+    horizontalDistance = 2.0f,
+    verticalDistance = 1.5f,
+)
+
+// Compute the layout
+val adapter = OrgTreeAdapter(ceo)
+val result = WalkerTreeLayout(adapter, config).layout()
+```
+
+### 3. Read the Results
+
+`TreeLayoutResult<T>` gives you access to computed coordinates:
+
+```kotlin
+// Get a single node's position
+val ceoPos = result.getPosition(ceo)
+println("CEO is at (${ceoPos.x}, ${ceoPos.y})")
+
+// Iterate all positions — useful for rendering
+result.getPositions().forEach { (node, point) ->
+    println("${node.name} -> (${point.x}, ${point.y})")
+}
+
+// Query layout metadata
+println("Tree depth: ${result.getMaxDepth()}")
+```
+
+Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per level.
+
+## API Reference
+
+### `TreeAdapter<T>`
+
+| Method                       | Description                                 |
+|------------------------------|---------------------------------------------|
+| `root(): T`                  | Returns the root node of the tree.          |
+| `children(node: T): List<T>` | Returns children in left-to-right order.    |
+| `parent(node: T): T?`        | Returns the parent, or `null` for the root. |
+| `isLeaf(node: T): Boolean`   | Returns `true` if the node has no children. |
+
+### `WalkerLayoutConfiguration`
+
+| Property             | Type    | Default | Description                            |
+|----------------------|---------|---------|----------------------------------------|
+| `horizontalDistance` | `Float` | `1.0f`  | Minimum spacing between sibling nodes. |
+| `verticalDistance`   | `Float` | `1.0f`  | Spacing between depth levels.          |
+
+### `WalkerTreeLayout<T>`
+
+| Method                          | Description                                          |
+|---------------------------------|------------------------------------------------------|
+| `layout(): TreeLayoutResult<T>` | Executes the algorithm and returns positioned nodes. |
+
+### `TreeLayoutResult<T>`
+
+| Method                          | Description                                     |
+|---------------------------------|-------------------------------------------------|
+| `getPosition(node: T): Point`   | Returns the `(x, y)` coordinate for a node.     |
+| `getPositions(): Map<T, Point>` | Returns all node-to-coordinate mappings.        |
+| `getMaxDepth(): Int`            | Returns the maximum depth of the laid-out tree. |
+
+### `Point`
+
+| Property | Type    | Description                                     |
+|----------|---------|-------------------------------------------------|
+| `x`      | `Float` | Horizontal position.                            |
+| `y`      | `Float` | Vertical position (depth × `verticalDistance`). |
+
+## Algorithm
+
+The layout is computed using the Buchheim–Jünger–Leipert improvement of the Walker algorithm, which guarantees:
+
+- **O(n) time complexity** — linear in the number of nodes.
+- **Aesthetic rules** — nodes at the same depth are aligned, subtrees are non-overlapping, and the drawing is as narrow as possible while preserving symmetry.
+- **Deterministic output** — the same tree always produces the same coordinates.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE) for details.

@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.androidLibrary
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -79,4 +80,13 @@ mavenPublishing {
             developerConnection = "ZZZ"
         }
     }
+}
+
+tasks.register<JavaExec>("runSample") {
+    description = "Runs the JVM sample application demonstrating tree layout"
+    val jvmJar = tasks.named("jvmJar")
+    dependsOn(jvmJar)
+    val runtimeClasspath = kotlin.jvm().compilations["main"].runtimeDependencyFiles
+    classpath = files(jvmJar.map { (it as Jar).archiveFile }, runtimeClasspath)
+    mainClass.set("io.github.linde9821.treelayout.sample.SampleAppKt")
 }
