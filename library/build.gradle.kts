@@ -11,6 +11,7 @@ group = "io.github.kotlin"
 version = "0.1.0"
 
 kotlin {
+    explicitApi()
     jvm()
     androidLibrary {
         namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
