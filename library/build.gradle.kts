@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -14,7 +13,7 @@ version = "0.1.0-SNAPSHOT"
 kotlin {
     explicitApi()
     jvm()
-    androidLibrary {
+    android {
         namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -41,7 +40,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            //put your multiplatform dependencies here
         }
 
         commonTest.dependencies {
@@ -55,7 +53,7 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates("io.github.linde9821", "treelayout-kmp", "1.0.0-SNAPSHOT")
+    coordinates("io.github.linde9821", "treelayout-kmp", "$version")
 
     pom {
         name = "TreeLayoutKMP"
