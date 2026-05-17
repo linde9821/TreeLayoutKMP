@@ -44,7 +44,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-                    useSafari()
+                    useChromeHeadless()
                 }
             }
         }
@@ -53,7 +53,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-                    useSafari()
+                    useChromeHeadless()
                 }
             }
         }
