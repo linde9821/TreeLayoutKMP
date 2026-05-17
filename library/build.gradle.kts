@@ -1,4 +1,7 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,7 +11,7 @@ plugins {
 }
 
 group = "io.github.linde9821"
-version = "0.1.0"
+version = "0.1.1"
 
 kotlin {
     explicitApi()
@@ -37,6 +40,12 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
     linuxX64()
+    js {
+        browser()
+    }
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {

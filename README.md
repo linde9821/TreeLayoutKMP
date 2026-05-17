@@ -5,22 +5,25 @@
 
 ![Tree Layout KMP Visualization Example](images/tree_layout.png)
 
-A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android, or iOS frameworks required.
+A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
+the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android,
+or iOS frameworks required.
 
-TreeLayoutKMP works with *any* tree structure you already have. You provide a thin adapter describing how to traverse your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
+TreeLayoutKMP works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
+your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
 
 ## Supported Targets
 
-| JVM | Android | iOS | Linux x64 |
-|:---:|:-------:|:---:|:---------:|
-| ✅  |   ✅    | ✅  |    ✅     |
+| JVM | Android | iOS | Linux x64 | wasmJs | js |
+|:---:|:-------:|:---:|:---------:|:-------|:---|
+|  ✅  |    ✅    |  ✅  |     ✅     | ✅      | ✅  |
 
 ## Installation
 
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.1.0")
+    implementation("io.github.linde9821:treelayout-kmp:0.1.1")
 }
 ```
 
@@ -28,7 +31,8 @@ dependencies {
 
 ### 1. Implement `TreeAdapter<T>`
 
-The library is decoupled from any specific tree representation through the `TreeAdapter<T>` interface. This design means you never need to convert your domain model into a library-specific node class — you simply describe how to navigate it.
+The library is decoupled from any specific tree representation through the `TreeAdapter<T>` interface. This design means
+you never need to convert your domain model into a library-specific node class — you simply describe how to navigate it.
 
 ```kotlin
 import io.github.linde9821.treelayout.TreeAdapter
@@ -49,7 +53,9 @@ class OrgTreeAdapter(private val rootNode: OrgNode) : TreeAdapter<OrgNode> {
 ```
 
 > **Why an adapter pattern?**  
-> Tree structures vary wildly across domains — file systems, ASTs, org charts, UI component trees. Rather than forcing you to wrap every node in a library class, `TreeAdapter<T>` lets the layout engine traverse your data in-place. This keeps allocations minimal and avoids coupling your domain layer to a visualization concern.
+> Tree structures vary wildly across domains — file systems, ASTs, org charts, UI component trees. Rather than forcing
+> you to wrap every node in a library class, `TreeAdapter<T>` lets the layout engine traverse your data in-place. This
+> keeps allocations minimal and avoids coupling your domain layer to a visualization concern.
 
 ### 2. Run the Layout
 
@@ -58,13 +64,17 @@ import io.github.linde9821.treelayout.WalkerTreeLayout
 import io.github.linde9821.treelayout.WalkerLayoutConfiguration
 
 // Build your tree
-val ceo = OrgNode("CEO", reports = listOf(
-    OrgNode("VP Engineering", reports = listOf(
-        OrgNode("Team Lead A"),
-        OrgNode("Team Lead B"),
-    )),
-    OrgNode("VP Design"),
-))
+val ceo = OrgNode(
+    "CEO", reports = listOf(
+        OrgNode(
+            "VP Engineering", reports = listOf(
+                OrgNode("Team Lead A"),
+                OrgNode("Team Lead B"),
+            )
+        ),
+        OrgNode("VP Design"),
+    )
+)
 
 // Configure spacing (optional — defaults to 1.0 for both axes)
 val config = WalkerLayoutConfiguration(
@@ -95,7 +105,8 @@ result.getPositions().forEach { (node, point) ->
 println("Tree depth: ${result.getMaxDepth()}")
 ```
 
-Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per level.
+Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per
+level.
 
 ## API Reference
 
@@ -141,12 +152,14 @@ Coordinates use a top-down orientation: the root is at `y = 0`, and depth increa
 The layout is computed using the Buchheim–Jünger–Leipert improvement of the Walker algorithm, which guarantees:
 
 - **O(n) time complexity** — linear in the number of nodes.
-- **Aesthetic rules** — nodes at the same depth are aligned, subtrees are non-overlapping, and the drawing is as narrow as possible while preserving symmetry.
+- **Aesthetic rules** — nodes at the same depth are aligned, subtrees are non-overlapping, and the drawing is as narrow
+  as possible while preserving symmetry.
 - **Deterministic output** — the same tree always produces the same coordinates.
 
 ## Running the Sample
 
-The repository includes a JVM sample application that demonstrates the layout algorithm with an asymmetric tree. It renders an ASCII visualization to the console and exports a PNG image.
+The repository includes a JVM sample application that demonstrates the layout algorithm with an asymmetric tree. It
+renders an ASCII visualization to the console and exports a PNG image.
 
 Run it with:
 
