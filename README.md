@@ -1,5 +1,8 @@
 # TreeLayoutKMP
 
+> ⚠️ **This library is under active development and has not reached a stable release yet.**
+> The API may change between versions. Feedback and contributions are welcome.
+
 ![Tree Layout KMP Visualization Example](images/tree_layout.png)
 
 A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android, or iOS frameworks required.
@@ -17,7 +20,7 @@ TreeLayoutKMP works with *any* tree structure you already have. You provide a th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.kotlin:library:0.1.0")
+    implementation("io.github.linde9821:treelayout-kmp:0.1.0")
 }
 ```
 
@@ -140,6 +143,23 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
 - **O(n) time complexity** — linear in the number of nodes.
 - **Aesthetic rules** — nodes at the same depth are aligned, subtrees are non-overlapping, and the drawing is as narrow as possible while preserving symmetry.
 - **Deterministic output** — the same tree always produces the same coordinates.
+
+## Running the Sample
+
+The repository includes a JVM sample application that demonstrates the layout algorithm with an asymmetric tree. It renders an ASCII visualization to the console and exports a PNG image.
+
+Run it with:
+
+```bash
+./gradlew :library:runSample
+```
+
+This will:
+
+1. Compute a layout for a multi-level tree and print it as ASCII art.
+2. Export a `tree_layout.png` file to the project root.
+
+The sample source lives in `library/src/jvmMain/kotlin/io/github/linde9821/treelayout/sample/`.
 
 ## License
 
