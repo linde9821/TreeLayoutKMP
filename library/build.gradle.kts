@@ -14,7 +14,7 @@ kotlin {
     explicitApi()
     jvm()
     android {
-        namespace = "org.jetbrains.kotlinx.multiplatform.library.template"
+        namespace = "org.github.linde9821.treelayout"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
