@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = "io.github.kotlin"
-version = "0.1.0"
+group = "io.github.linde9821"
+version = "0.1.0-SNAPSHOT"
 
 kotlin {
     explicitApi()
@@ -25,10 +25,12 @@ kotlin {
         }
 
         compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(
-                    JvmTarget.JVM_11
-                )
+            compileTaskProvider.configure{
+                compilerOptions {
+                    jvmTarget.set(
+                        JvmTarget.JVM_11
+                    )
+                }
             }
         }
     }
@@ -49,35 +51,35 @@ kotlin {
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
 
     signAllPublications()
 
-    coordinates(group.toString(), "library", version.toString())
+    coordinates("io.github.linde9821", "treelayout-kmp", "1.0.0-SNAPSHOT")
 
     pom {
         name = "TreeLayoutKMP"
-        description = "A library."
+        description = "A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time."
         inceptionYear = "2026"
         url = "https://github.com/linde9821/TreeLayoutKMP"
         licenses {
             license {
-                name = "XXX"
-                url = "YYY"
-                distribution = "ZZZ"
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "repo"
             }
         }
         developers {
             developer {
-                id = "XXX"
-                name = "YYY"
-                url = "ZZZ"
+                id = "linde9821"
+                name = "Moritz Lindner"
+                url = "https://github.com/linde9821"
             }
         }
         scm {
-            url = "XXX"
-            connection = "YYY"
-            developerConnection = "ZZZ"
+            url = "https://github.com/linde9821/TreeLayoutKMP"
+            connection = "scm:git:git://github.com/linde9821/TreeLayoutKMP.git"
+            developerConnection = "scm:git:ssh://git@github.com/linde9821/TreeLayoutKMP.git"
         }
     }
 }
