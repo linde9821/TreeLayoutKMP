@@ -254,3 +254,5 @@ xcuserdata/
 
 .kotlin
 .kiro
+*.gpg
+gradle.properties
