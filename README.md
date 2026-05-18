@@ -64,8 +64,8 @@ class OrgTreeAdapter(private val rootNode: OrgNode) : TreeAdapter<OrgNode> {
 ### 2. Run the Layout
 
 ```kotlin
-import io.github.linde9821.treelayout.WalkerTreeLayout
-import io.github.linde9821.treelayout.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 
 // Build your tree
 val ceo = OrgNode(
