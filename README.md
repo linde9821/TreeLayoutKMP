@@ -1,5 +1,9 @@
 # TreeLayoutKMP
 
+[![CI](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml/badge.svg)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp-android)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp-android)
+
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
 
@@ -23,7 +27,7 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.1.1")
+    implementation("io.github.linde9821:treelayout-kmp:0.2.0")
 }
 ```
 
