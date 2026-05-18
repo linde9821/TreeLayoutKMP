@@ -220,23 +220,25 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
   as possible while preserving symmetry.
 - **Deterministic output** — the same tree always produces the same coordinates.
 
-## Running the Sample
+## Running the Samples
 
-The repository includes a JVM sample application that demonstrates the layout algorithm with an asymmetric tree. It
-renders an ASCII visualization to the console and exports a PNG image.
+### Compose Desktop (interactive visualization)
 
-Run it with:
+The `sample/` module contains a Compose Desktop application that renders an interactive tree visualization using the library.
+
+```bash
+./gradlew :sample:run
+```
+
+This opens a window displaying an org-chart tree with variable node sizes and edges drawn between parent and child nodes.
+
+### JVM CLI (ASCII + PNG export)
+
+The library module includes a JVM sample that renders an ASCII visualization to the console and exports a PNG image.
 
 ```bash
 ./gradlew :library:runSample
 ```
-
-This will:
-
-1. Compute a layout for a multi-level tree and print it as ASCII art.
-2. Export a `tree_layout.png` file to the project root.
-
-The sample source lives in `library/src/jvmMain/kotlin/io/github/linde9821/treelayout/sample/`.
 
 ## License
 
