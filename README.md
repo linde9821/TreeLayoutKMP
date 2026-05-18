@@ -133,6 +133,7 @@ val result = WalkerTreeLayout(
 ```
 
 The layout engine uses node extents to compute center-to-center distances:
+
 - **Horizontal**: `width(left)/2 + horizontalDistance + width(right)/2`
 - **Vertical**: each level's y-offset accounts for the tallest node at the preceding level
 
@@ -165,27 +166,27 @@ Available orientations: `TopToBottom`, `BottomToTop`, `LeftToRight`, `RightToLef
 
 ### `WalkerLayoutConfiguration`
 
-| Property             | Type          | Default                    | Description                            |
-|----------------------|---------------|----------------------------|----------------------------------------|
-| `horizontalDistance` | `Float`       | `1.0f`                     | Minimum spacing between sibling nodes. |
-| `verticalDistance`   | `Float`       | `1.0f`                     | Spacing between depth levels.          |
-| `orientation`        | `Orientation` | `Orientation.TopToBottom`  | Direction the tree grows from root.    |
+| Property             | Type          | Default                   | Description                            |
+|----------------------|---------------|---------------------------|----------------------------------------|
+| `horizontalDistance` | `Float`       | `1.0f`                    | Minimum spacing between sibling nodes. |
+| `verticalDistance`   | `Float`       | `1.0f`                    | Spacing between depth levels.          |
+| `orientation`        | `Orientation` | `Orientation.TopToBottom` | Direction the tree grows from root.    |
 
 ### `Orientation`
 
-| Value          | Description                              |
-|----------------|------------------------------------------|
-| `TopToBottom`  | Root at top, leaves grow downward.       |
-| `BottomToTop`  | Root at bottom, leaves grow upward.      |
-| `LeftToRight`  | Root at left, leaves grow rightward.     |
-| `RightToLeft`  | Root at right, leaves grow leftward.     |
+| Value         | Description                          |
+|---------------|--------------------------------------|
+| `TopToBottom` | Root at top, leaves grow downward.   |
+| `BottomToTop` | Root at bottom, leaves grow upward.  |
+| `LeftToRight` | Root at left, leaves grow rightward. |
+| `RightToLeft` | Root at right, leaves grow leftward. |
 
 ### `NodeExtentProvider<T>`
 
-| Method                    | Description                  |
-|---------------------------|------------------------------|
-| `width(node: T): Float`  | Returns the width of a node. |
-| `height(node: T): Float` | Returns the height of a node.|
+| Method                   | Description                   |
+|--------------------------|-------------------------------|
+| `width(node: T): Float`  | Returns the width of a node.  |
+| `height(node: T): Float` | Returns the height of a node. |
 
 ### `WalkerTreeLayout<T>`
 
@@ -224,13 +225,15 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
 
 ### Compose Desktop (interactive visualization)
 
-The `sample/` module contains a Compose Desktop application that renders an interactive tree visualization using the library.
+The `sample/` module contains a Compose Desktop application that renders an interactive tree visualization using the
+library.
 
 ```bash
 ./gradlew :sample:run
 ```
 
-This opens a window displaying an org-chart tree with variable node sizes and edges drawn between parent and child nodes.
+This opens a window displaying an org-chart tree with variable node sizes and edges drawn between parent and child
+nodes.
 
 ### JVM CLI (ASCII + PNG export)
 

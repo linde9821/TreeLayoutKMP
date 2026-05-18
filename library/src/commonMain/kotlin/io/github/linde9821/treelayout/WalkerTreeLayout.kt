@@ -70,6 +70,7 @@ private class LayoutContext<T>(
     // Precomputed structural info
     private val depthOf = HashMap<T, Int>()
     private val indexAmongSiblings = HashMap<T, Int>()
+
     // Precomputed max height per depth level for vertical positioning
     private val maxHeightAtDepth = HashMap<Int, Float>()
 
@@ -158,7 +159,7 @@ private class LayoutContext<T>(
             ancestor[voPlus] = v
 
             val shift = (prelim[viMinus]!! + siMinus) - (prelim[viPlus]!! + siPlus) +
-                horizontalSeparation(viMinus, viPlus)
+                    horizontalSeparation(viMinus, viPlus)
             if (shift > 0) {
                 moveSubtree(ancestorOf(viMinus, v, defaultAncestor), v, shift)
                 siPlus += shift

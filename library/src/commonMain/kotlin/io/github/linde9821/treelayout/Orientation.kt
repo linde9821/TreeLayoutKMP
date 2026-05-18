@@ -6,10 +6,13 @@ package io.github.linde9821.treelayout
 public enum class Orientation {
     /** Root at top, leaves grow downward. */
     TopToBottom,
+
     /** Root at bottom, leaves grow upward. */
     BottomToTop,
+
     /** Root at left, leaves grow rightward. */
     LeftToRight,
+
     /** Root at right, leaves grow leftward. */
     RightToLeft,
 }

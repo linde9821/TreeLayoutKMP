@@ -71,24 +71,34 @@ internal class StringTreeAdapter(
 
 public fun main(): Unit {
     // Asymmetric tree: 4 levels deep, varying widths
-    val tree = SampleNode("root", listOf(
-        SampleNode("A", listOf(
-            SampleNode("A1"),
-            SampleNode("A2", listOf(
-                SampleNode("A2a"),
-                SampleNode("A2b"),
-                SampleNode("A2c")
-            )),
-            SampleNode("A3")
-        )),
-        SampleNode("B"),
-        SampleNode("C", listOf(
-            SampleNode("C1", listOf(
-                SampleNode("C1x")
-            )),
-            SampleNode("C2")
-        ))
-    ))
+    val tree = SampleNode(
+        "root", listOf(
+            SampleNode(
+                "A", listOf(
+                    SampleNode("A1"),
+                    SampleNode(
+                        "A2", listOf(
+                            SampleNode("A2a"),
+                            SampleNode("A2b"),
+                            SampleNode("A2c")
+                        )
+                    ),
+                    SampleNode("A3")
+                )
+            ),
+            SampleNode("B"),
+            SampleNode(
+                "C", listOf(
+                    SampleNode(
+                        "C1", listOf(
+                            SampleNode("C1x")
+                        )
+                    ),
+                    SampleNode("C2")
+                )
+            )
+        )
+    )
 
     val adapter = SampleAdapter(tree)
     val layout = WalkerTreeLayout(

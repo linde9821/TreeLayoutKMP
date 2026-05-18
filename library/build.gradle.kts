@@ -27,7 +27,7 @@ kotlin {
         }
 
         compilations.configureEach {
-            compileTaskProvider.configure{
+            compileTaskProvider.configure {
                 compilerOptions {
                     jvmTarget.set(
                         JvmTarget.JVM_11
@@ -79,7 +79,8 @@ mavenPublishing {
 
     pom {
         name = "TreeLayoutKMP"
-        description = "A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time."
+        description =
+            "A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time."
         inceptionYear = "2026"
         url = "https://github.com/linde9821/TreeLayoutKMP"
         licenses {

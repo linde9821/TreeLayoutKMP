@@ -2,7 +2,8 @@
 
 ## Current State
 
-TreeLayoutKMP is a functional KMP library implementing the Buchheim–Jünger–Leipert (Walker) tree layout algorithm in O(n) time. It ships with:
+TreeLayoutKMP is a functional KMP library implementing the Buchheim–Jünger–Leipert (Walker) tree layout algorithm in O(
+n) time. It ships with:
 
 - Pure Kotlin `commonMain` implementation (zero platform dependencies)
 - `TreeAdapter<T>` interface for zero-copy integration with any tree model
@@ -17,7 +18,8 @@ TreeLayoutKMP is a functional KMP library implementing the Buchheim–Jünger–
 
 **Priority: High**
 
-Currently, all nodes are treated as dimensionless points. Real-world trees have nodes with varying widths and heights (labels, icons, content boxes). The layout must account for node extents to prevent overlap.
+Currently, all nodes are treated as dimensionless points. Real-world trees have nodes with varying widths and heights (
+labels, icons, content boxes). The layout must account for node extents to prevent overlap.
 
 - Add a `NodeExtentProvider<T>` interface with `width(node: T): Float` and `height(node: T): Float`
 - Integrate extents into spacing calculations during the Walker passes
@@ -67,10 +69,10 @@ Allow control over how parent nodes align relative to their children.
 - KDoc on all public API members (already partially done)
 - Published API docs (Dokka → GitHub Pages)
 - Platform-specific rendering samples:
-  - Jetpack Compose (Android/Desktop)
-  - SwiftUI (iOS)
-  - Canvas (JS/Wasm)
-  - SVG export utility
+    - Jetpack Compose (Android/Desktop)
+    - SwiftUI (iOS)
+    - Canvas (JS/Wasm)
+    - SVG export utility
 
 ### 7. Performance Benchmarks
 
