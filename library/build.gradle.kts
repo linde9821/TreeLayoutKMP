@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.linde9821"
-version = "0.1.1"
+version = "0.2.0"
 
 kotlin {
     explicitApi()
@@ -27,7 +27,7 @@ kotlin {
         }
 
         compilations.configureEach {
-            compileTaskProvider.configure{
+            compileTaskProvider.configure {
                 compilerOptions {
                     jvmTarget.set(
                         JvmTarget.JVM_11
@@ -40,11 +40,12 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
     linuxX64()
+    val useChrome = System.getenv("CI") == "true"
     js {
         browser {
             testTask {
                 useKarma {
-                    useChromeHeadless()
+                    if (useChrome) useChromeHeadless() else useSafari()
                 }
             }
         }
@@ -53,7 +54,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-                    useChromeHeadless()
+                    if (useChrome) useChromeHeadless() else useSafari()
                 }
             }
         }
@@ -78,7 +79,8 @@ mavenPublishing {
 
     pom {
         name = "TreeLayoutKMP"
-        description = "A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time."
+        description =
+            "A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time."
         inceptionYear = "2026"
         url = "https://github.com/linde9821/TreeLayoutKMP"
         licenses {

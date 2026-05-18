@@ -1,9 +1,13 @@
 # TreeLayoutKMP
 
+[![CI](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml/badge.svg)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp-android)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp-android)
+
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
 
-![Tree Layout KMP Visualization Example](images/tree_layout.png)
+![Tree Layout KMP Visualization Example](images/output.gif)
 
 A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
 the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android,
@@ -23,7 +27,7 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.1.1")
+    implementation("io.github.linde9821:treelayout-kmp:0.2.0")
 }
 ```
 
@@ -60,8 +64,8 @@ class OrgTreeAdapter(private val rootNode: OrgNode) : TreeAdapter<OrgNode> {
 ### 2. Run the Layout
 
 ```kotlin
-import io.github.linde9821.treelayout.WalkerTreeLayout
-import io.github.linde9821.treelayout.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 
 // Build your tree
 val ceo = OrgNode(
@@ -108,6 +112,47 @@ println("Tree depth: ${result.getMaxDepth()}")
 Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per
 level.
 
+### 4. Variable Node Sizes
+
+By default, nodes are treated as dimensionless points. For real-world trees where nodes have varying widths and heights
+(labels, icons, content boxes), provide a `NodeExtentProvider<T>` to prevent overlap:
+
+```kotlin
+import io.github.linde9821.treelayout.NodeExtentProvider
+
+class OrgExtentProvider : NodeExtentProvider<OrgNode> {
+    override fun width(node: OrgNode): Float = node.name.length * 10f
+    override fun height(node: OrgNode): Float = 40f
+}
+
+val result = WalkerTreeLayout(
+    adapter = OrgTreeAdapter(ceo),
+    configuration = WalkerLayoutConfiguration(horizontalDistance = 20f, verticalDistance = 60f),
+    nodeExtentProvider = OrgExtentProvider(),
+).layout()
+```
+
+The layout engine uses node extents to compute center-to-center distances:
+
+- **Horizontal**: `width(left)/2 + horizontalDistance + width(right)/2`
+- **Vertical**: each level's y-offset accounts for the tallest node at the preceding level
+
+### 5. Layout Orientation
+
+By default the tree grows top-to-bottom. Use the `orientation` property to change direction:
+
+```kotlin
+val config = WalkerLayoutConfiguration(
+    horizontalDistance = 2.0f,
+    verticalDistance = 1.5f,
+    orientation = Orientation.LeftToRight, // tree grows left → right
+)
+
+val result = WalkerTreeLayout(adapter, config).layout()
+```
+
+Available orientations: `TopToBottom`, `BottomToTop`, `LeftToRight`, `RightToLeft`.
+
 ## API Reference
 
 ### `TreeAdapter<T>`
@@ -121,16 +166,36 @@ level.
 
 ### `WalkerLayoutConfiguration`
 
-| Property             | Type    | Default | Description                            |
-|----------------------|---------|---------|----------------------------------------|
-| `horizontalDistance` | `Float` | `1.0f`  | Minimum spacing between sibling nodes. |
-| `verticalDistance`   | `Float` | `1.0f`  | Spacing between depth levels.          |
+| Property             | Type          | Default                   | Description                            |
+|----------------------|---------------|---------------------------|----------------------------------------|
+| `horizontalDistance` | `Float`       | `1.0f`                    | Minimum spacing between sibling nodes. |
+| `verticalDistance`   | `Float`       | `1.0f`                    | Spacing between depth levels.          |
+| `orientation`        | `Orientation` | `Orientation.TopToBottom` | Direction the tree grows from root.    |
+
+### `Orientation`
+
+| Value         | Description                          |
+|---------------|--------------------------------------|
+| `TopToBottom` | Root at top, leaves grow downward.   |
+| `BottomToTop` | Root at bottom, leaves grow upward.  |
+| `LeftToRight` | Root at left, leaves grow rightward. |
+| `RightToLeft` | Root at right, leaves grow leftward. |
+
+### `NodeExtentProvider<T>`
+
+| Method                   | Description                   |
+|--------------------------|-------------------------------|
+| `width(node: T): Float`  | Returns the width of a node.  |
+| `height(node: T): Float` | Returns the height of a node. |
 
 ### `WalkerTreeLayout<T>`
 
 | Method                          | Description                                          |
 |---------------------------------|------------------------------------------------------|
 | `layout(): TreeLayoutResult<T>` | Executes the algorithm and returns positioned nodes. |
+
+Constructor accepts an optional `nodeExtentProvider` parameter. When omitted, nodes are treated as dimensionless points
+(backward compatible).
 
 ### `TreeLayoutResult<T>`
 
@@ -156,23 +221,27 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
   as possible while preserving symmetry.
 - **Deterministic output** — the same tree always produces the same coordinates.
 
-## Running the Sample
+## Running the Samples
 
-The repository includes a JVM sample application that demonstrates the layout algorithm with an asymmetric tree. It
-renders an ASCII visualization to the console and exports a PNG image.
+### Compose Desktop (interactive visualization)
 
-Run it with:
+The `sample/` module contains a Compose Desktop application that renders an interactive tree visualization using the
+library.
+
+```bash
+./gradlew :sample:run
+```
+
+This opens a window displaying an org-chart tree with variable node sizes and edges drawn between parent and child
+nodes.
+
+### JVM CLI (ASCII + PNG export)
+
+The library module includes a JVM sample that renders an ASCII visualization to the console and exports a PNG image.
 
 ```bash
 ./gradlew :library:runSample
 ```
-
-This will:
-
-1. Compute a layout for a multi-level tree and print it as ASCII art.
-2. Export a `tree_layout.png` file to the project root.
-
-The sample source lives in `library/src/jvmMain/kotlin/io/github/linde9821/treelayout/sample/`.
 
 ## License
 

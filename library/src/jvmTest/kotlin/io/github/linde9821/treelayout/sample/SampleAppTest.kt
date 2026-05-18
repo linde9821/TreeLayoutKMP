@@ -1,7 +1,7 @@
 package io.github.linde9821.treelayout.sample
 
-import io.github.linde9821.treelayout.WalkerLayoutConfiguration
-import io.github.linde9821.treelayout.WalkerTreeLayout
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,24 +9,34 @@ import kotlin.test.assertTrue
 
 internal class SampleAppTest {
 
-    private val tree = SampleNode("root", listOf(
-        SampleNode("A", listOf(
-            SampleNode("A1"),
-            SampleNode("A2", listOf(
-                SampleNode("A2a"),
-                SampleNode("A2b"),
-                SampleNode("A2c")
-            )),
-            SampleNode("A3")
-        )),
-        SampleNode("B"),
-        SampleNode("C", listOf(
-            SampleNode("C1", listOf(
-                SampleNode("C1x")
-            )),
-            SampleNode("C2")
-        ))
-    ))
+    private val tree = SampleNode(
+        "root", listOf(
+            SampleNode(
+                "A", listOf(
+                    SampleNode("A1"),
+                    SampleNode(
+                        "A2", listOf(
+                            SampleNode("A2a"),
+                            SampleNode("A2b"),
+                            SampleNode("A2c")
+                        )
+                    ),
+                    SampleNode("A3")
+                )
+            ),
+            SampleNode("B"),
+            SampleNode(
+                "C", listOf(
+                    SampleNode(
+                        "C1", listOf(
+                            SampleNode("C1x")
+                        )
+                    ),
+                    SampleNode("C2")
+                )
+            )
+        )
+    )
 
     private val adapter = SampleAdapter(tree)
     private val layout = WalkerTreeLayout(

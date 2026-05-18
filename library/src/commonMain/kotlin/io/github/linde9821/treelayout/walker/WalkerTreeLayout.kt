@@ -1,17 +1,11 @@
-package io.github.linde9821.treelayout
+package io.github.linde9821.treelayout.walker
 
+import io.github.linde9821.treelayout.NodeExtentProvider
+import io.github.linde9821.treelayout.Orientation
+import io.github.linde9821.treelayout.Point
+import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.TreeLayoutResult
 import kotlin.math.max
-
-/**
- * Configuration for the Walker layout algorithm.
- *
- * @property horizontalDistance Minimum horizontal spacing between sibling nodes.
- * @property verticalDistance Vertical spacing between depth levels.
- */
-public data class WalkerLayoutConfiguration(
-    public val horizontalDistance: Float = 1.0f,
-    public val verticalDistance: Float = 1.0f,
-)
 
 /**
  * Computes a tidy tree layout using the Walker algorithm (Buchheim variant).
@@ -22,19 +16,30 @@ public data class WalkerLayoutConfiguration(
  * @param T The node type of the external tree.
  * @param adapter Adapter providing tree traversal over the external structure.
  * @param configuration Layout spacing parameters.
+ * @param nodeExtentProvider Provides node dimensions. Defaults to dimensionless points (0×0).
  */
 public class WalkerTreeLayout<T>(
     private val adapter: TreeAdapter<T>,
     private val configuration: WalkerLayoutConfiguration = WalkerLayoutConfiguration(),
+    private val nodeExtentProvider: NodeExtentProvider<T> = UniformNodeExtentProvider(),
 ) {
     /**
      * Executes the layout algorithm and returns the result.
      */
     public fun layout(): TreeLayoutResult<T> {
-        val ctx = LayoutContext(adapter, configuration)
+        val ctx = LayoutContext(adapter, configuration, nodeExtentProvider)
         ctx.execute()
         return ctx.buildResult()
     }
+}
+
+/**
+ * Default extent provider that returns zero dimensions for all nodes,
+ * treating them as dimensionless points for backward compatibility.
+ */
+private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
+    override fun width(node: T): Float = 0.0f
+    override fun height(node: T): Float = 0.0f
 }
 
 /**
@@ -43,6 +48,7 @@ public class WalkerTreeLayout<T>(
 private class LayoutContext<T>(
     private val adapter: TreeAdapter<T>,
     private val config: WalkerLayoutConfiguration,
+    private val extents: NodeExtentProvider<T>,
 ) {
     private val prelim = HashMap<T, Float>()
     private val modifiers = HashMap<T, Float>()
@@ -56,6 +62,9 @@ private class LayoutContext<T>(
     // Precomputed structural info
     private val depthOf = HashMap<T, Int>()
     private val indexAmongSiblings = HashMap<T, Int>()
+
+    // Precomputed max height per depth level for vertical positioning
+    private val maxHeightAtDepth = HashMap<Int, Float>()
 
     fun execute() {
         val root = adapter.root()
@@ -76,11 +85,20 @@ private class LayoutContext<T>(
         shifts[node] = 0f
         changes[node] = 0f
 
+        // Track max height at each depth level
+        val h = extents.height(node)
+        maxHeightAtDepth[depth] = max(maxHeightAtDepth[depth] ?: 0f, h)
+
         val children = adapter.children(node)
         children.forEachIndexed { index, child ->
             indexAmongSiblings[child] = index
             initNodes(child, depth + 1)
         }
+    }
+
+    /** Computes the required distance between centers of two horizontally adjacent nodes. */
+    private fun horizontalSeparation(left: T, right: T): Float {
+        return extents.width(left) / 2f + config.horizontalDistance + extents.width(right) / 2f
     }
 
     private fun firstWalk(v: T) {
@@ -89,7 +107,7 @@ private class LayoutContext<T>(
             prelim[v] = 0f
             val w = leftSibling(v)
             if (w != null) {
-                prelim[v] = prelim[w]!! + config.horizontalDistance
+                prelim[v] = prelim[w]!! + horizontalSeparation(w, v)
             }
         } else {
             var defaultAncestor = children.first()
@@ -104,7 +122,7 @@ private class LayoutContext<T>(
             val midpoint = 0.5f * (prelim[children.first()]!! + prelim[children.last()]!!)
             val w = leftSibling(v)
             if (w != null) {
-                prelim[v] = prelim[w]!! + config.horizontalDistance
+                prelim[v] = prelim[w]!! + horizontalSeparation(w, v)
                 modifiers[v] = prelim[v]!! - midpoint
             } else {
                 prelim[v] = midpoint
@@ -132,7 +150,8 @@ private class LayoutContext<T>(
             voPlus = nextRight(voPlus)!!
             ancestor[voPlus] = v
 
-            val shift = (prelim[viMinus]!! + siMinus) - (prelim[viPlus]!! + siPlus) + config.horizontalDistance
+            val shift = (prelim[viMinus]!! + siMinus) - (prelim[viPlus]!! + siPlus) +
+                    horizontalSeparation(viMinus, viPlus)
             if (shift > 0) {
                 moveSubtree(ancestorOf(viMinus, v, defaultAncestor), v, shift)
                 siPlus += shift
@@ -180,9 +199,18 @@ private class LayoutContext<T>(
 
     private fun secondWalk(v: T, m: Float) {
         val depth = depthOf[v]!!
-        val x = prelim[v]!! + m
-        val y = depth.toFloat() * config.verticalDistance
-        positions[v] = Point(x, y)
+        val across = prelim[v]!! + m
+        // Compute depth-axis position by accumulating max heights of preceding levels + gaps
+        var along = 0f
+        for (d in 0 until depth) {
+            along += maxHeightAtDepth[d]!! + config.verticalDistance
+        }
+        positions[v] = when (config.orientation) {
+            Orientation.TopToBottom -> Point(across, along)
+            Orientation.BottomToTop -> Point(across, -along)
+            Orientation.LeftToRight -> Point(along, across)
+            Orientation.RightToLeft -> Point(-along, across)
+        }
         maxDepth = max(maxDepth, depth)
 
         for (w in adapter.children(v)) {
