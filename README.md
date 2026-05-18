@@ -136,6 +136,22 @@ The layout engine uses node extents to compute center-to-center distances:
 - **Horizontal**: `width(left)/2 + horizontalDistance + width(right)/2`
 - **Vertical**: each level's y-offset accounts for the tallest node at the preceding level
 
+### 5. Layout Orientation
+
+By default the tree grows top-to-bottom. Use the `orientation` property to change direction:
+
+```kotlin
+val config = WalkerLayoutConfiguration(
+    horizontalDistance = 2.0f,
+    verticalDistance = 1.5f,
+    orientation = Orientation.LeftToRight, // tree grows left → right
+)
+
+val result = WalkerTreeLayout(adapter, config).layout()
+```
+
+Available orientations: `TopToBottom`, `BottomToTop`, `LeftToRight`, `RightToLeft`.
+
 ## API Reference
 
 ### `TreeAdapter<T>`
@@ -149,10 +165,20 @@ The layout engine uses node extents to compute center-to-center distances:
 
 ### `WalkerLayoutConfiguration`
 
-| Property             | Type    | Default | Description                            |
-|----------------------|---------|---------|----------------------------------------|
-| `horizontalDistance` | `Float` | `1.0f`  | Minimum spacing between sibling nodes. |
-| `verticalDistance`   | `Float` | `1.0f`  | Spacing between depth levels.          |
+| Property             | Type          | Default                    | Description                            |
+|----------------------|---------------|----------------------------|----------------------------------------|
+| `horizontalDistance` | `Float`       | `1.0f`                     | Minimum spacing between sibling nodes. |
+| `verticalDistance`   | `Float`       | `1.0f`                     | Spacing between depth levels.          |
+| `orientation`        | `Orientation` | `Orientation.TopToBottom`  | Direction the tree grows from root.    |
+
+### `Orientation`
+
+| Value          | Description                              |
+|----------------|------------------------------------------|
+| `TopToBottom`  | Root at top, leaves grow downward.       |
+| `BottomToTop`  | Root at bottom, leaves grow upward.      |
+| `LeftToRight`  | Root at left, leaves grow rightward.     |
+| `RightToLeft`  | Root at right, leaves grow leftward.     |
 
 ### `NodeExtentProvider<T>`
 

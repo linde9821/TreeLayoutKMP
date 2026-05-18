@@ -7,10 +7,12 @@ import kotlin.math.max
  *
  * @property horizontalDistance Minimum horizontal spacing between sibling nodes.
  * @property verticalDistance Vertical spacing between depth levels.
+ * @property orientation Direction in which the tree grows from root to leaves.
  */
 public data class WalkerLayoutConfiguration(
     public val horizontalDistance: Float = 1.0f,
     public val verticalDistance: Float = 1.0f,
+    public val orientation: Orientation = Orientation.TopToBottom,
 )
 
 /**
@@ -204,13 +206,18 @@ private class LayoutContext<T>(
 
     private fun secondWalk(v: T, m: Float) {
         val depth = depthOf[v]!!
-        val x = prelim[v]!! + m
-        // Compute y by accumulating max heights of preceding levels + gaps
-        var y = 0f
+        val across = prelim[v]!! + m
+        // Compute depth-axis position by accumulating max heights of preceding levels + gaps
+        var along = 0f
         for (d in 0 until depth) {
-            y += maxHeightAtDepth[d]!! + config.verticalDistance
+            along += maxHeightAtDepth[d]!! + config.verticalDistance
         }
-        positions[v] = Point(x, y)
+        positions[v] = when (config.orientation) {
+            Orientation.TopToBottom -> Point(across, along)
+            Orientation.BottomToTop -> Point(across, -along)
+            Orientation.LeftToRight -> Point(along, across)
+            Orientation.RightToLeft -> Point(-along, across)
+        }
         maxDepth = max(maxDepth, depth)
 
         for (w in adapter.children(v)) {
