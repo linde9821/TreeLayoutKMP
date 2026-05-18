@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.linde9821"
-version = "0.1.1"
+version = "0.2.0"
 
 kotlin {
     explicitApi()
@@ -40,11 +40,12 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
     linuxX64()
+    val useChrome = System.getenv("CI") == "true"
     js {
         browser {
             testTask {
                 useKarma {
-                    useChromeHeadless()
+                    if (useChrome) useChromeHeadless() else useSafari()
                 }
             }
         }
@@ -53,7 +54,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-                    useChromeHeadless()
+                    if (useChrome) useChromeHeadless() else useSafari()
                 }
             }
         }
