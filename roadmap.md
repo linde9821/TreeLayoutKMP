@@ -17,7 +17,7 @@ TreeLayoutKMP is a functional KMP library implementing the Buchheim–Jünger–
 
 **Priority: High**
 
-Currently all nodes are treated as dimensionless points. Real-world trees have nodes with varying widths and heights (labels, icons, content boxes). The layout must account for node extents to prevent overlap.
+Currently, all nodes are treated as dimensionless points. Real-world trees have nodes with varying widths and heights (labels, icons, content boxes). The layout must account for node extents to prevent overlap.
 
 - Add a `NodeExtentProvider<T>` interface with `width(node: T): Float` and `height(node: T): Float`
 - Integrate extents into spacing calculations during the Walker passes

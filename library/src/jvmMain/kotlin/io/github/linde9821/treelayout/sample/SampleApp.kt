@@ -1,5 +1,6 @@
 package io.github.linde9821.treelayout.sample
 
+import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.TreeAdapter
 import io.github.linde9821.treelayout.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.WalkerTreeLayout
@@ -120,4 +121,22 @@ public fun main(): Unit {
     val outputFile = java.io.File("tree_layout.png")
     exportLayoutToPng(result, stringAdapter, outputFile)
     println("PNG exported to: ${outputFile.absolutePath}")
+
+    // Demo: Variable node sizes with NodeExtentProvider
+    println("\n--- Variable Node Sizes Demo ---")
+    val sizedExtents = object : NodeExtentProvider<SampleNode> {
+        override fun width(node: SampleNode): Float = node.name.length.toFloat() * 2f
+        override fun height(node: SampleNode): Float = 3f
+    }
+    val sizedLayout = WalkerTreeLayout(
+        adapter = adapter,
+        configuration = WalkerLayoutConfiguration(horizontalDistance = 2.0f, verticalDistance = 1.0f),
+        nodeExtentProvider = sizedExtents,
+    )
+    val sizedResult = sizedLayout.layout()
+    sizedResult.getPositions().forEach { (node, point) ->
+        val w = sizedExtents.width(node)
+        val h = sizedExtents.height(node)
+        println("${node.name.padEnd(4)} -> (${"%6.1f".format(point.x)}, ${"%4.1f".format(point.y)})  size=${w}x${h}")
+    }
 }

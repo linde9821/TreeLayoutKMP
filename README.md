@@ -112,6 +112,30 @@ println("Tree depth: ${result.getMaxDepth()}")
 Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per
 level.
 
+### 4. Variable Node Sizes
+
+By default, nodes are treated as dimensionless points. For real-world trees where nodes have varying widths and heights
+(labels, icons, content boxes), provide a `NodeExtentProvider<T>` to prevent overlap:
+
+```kotlin
+import io.github.linde9821.treelayout.NodeExtentProvider
+
+class OrgExtentProvider : NodeExtentProvider<OrgNode> {
+    override fun width(node: OrgNode): Float = node.name.length * 10f
+    override fun height(node: OrgNode): Float = 40f
+}
+
+val result = WalkerTreeLayout(
+    adapter = OrgTreeAdapter(ceo),
+    configuration = WalkerLayoutConfiguration(horizontalDistance = 20f, verticalDistance = 60f),
+    nodeExtentProvider = OrgExtentProvider(),
+).layout()
+```
+
+The layout engine uses node extents to compute center-to-center distances:
+- **Horizontal**: `width(left)/2 + horizontalDistance + width(right)/2`
+- **Vertical**: each level's y-offset accounts for the tallest node at the preceding level
+
 ## API Reference
 
 ### `TreeAdapter<T>`
@@ -130,11 +154,21 @@ level.
 | `horizontalDistance` | `Float` | `1.0f`  | Minimum spacing between sibling nodes. |
 | `verticalDistance`   | `Float` | `1.0f`  | Spacing between depth levels.          |
 
+### `NodeExtentProvider<T>`
+
+| Method                    | Description                  |
+|---------------------------|------------------------------|
+| `width(node: T): Float`  | Returns the width of a node. |
+| `height(node: T): Float` | Returns the height of a node.|
+
 ### `WalkerTreeLayout<T>`
 
 | Method                          | Description                                          |
 |---------------------------------|------------------------------------------------------|
 | `layout(): TreeLayoutResult<T>` | Executes the algorithm and returns positioned nodes. |
+
+Constructor accepts an optional `nodeExtentProvider` parameter. When omitted, nodes are treated as dimensionless points
+(backward compatible).
 
 ### `TreeLayoutResult<T>`
 
