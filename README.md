@@ -7,7 +7,7 @@
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
 
-![Tree Layout KMP Visualization Example](images/tree_layout.png)
+![Tree Layout KMP Visualization Example](images/output.gif)
 
 A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
 the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android,
