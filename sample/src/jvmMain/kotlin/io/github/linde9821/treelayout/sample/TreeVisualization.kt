@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.sp
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
 import io.github.linde9821.treelayout.TreeAdapter
-import io.github.linde9821.treelayout.WalkerLayoutConfiguration
-import io.github.linde9821.treelayout.WalkerTreeLayout
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 
 @Composable
 fun TreeVisualization() {

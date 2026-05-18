@@ -1,19 +1,11 @@
-package io.github.linde9821.treelayout
+package io.github.linde9821.treelayout.walker
 
+import io.github.linde9821.treelayout.NodeExtentProvider
+import io.github.linde9821.treelayout.Orientation
+import io.github.linde9821.treelayout.Point
+import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.TreeLayoutResult
 import kotlin.math.max
-
-/**
- * Configuration for the Walker layout algorithm.
- *
- * @property horizontalDistance Minimum horizontal spacing between sibling nodes.
- * @property verticalDistance Vertical spacing between depth levels.
- * @property orientation Direction in which the tree grows from root to leaves.
- */
-public data class WalkerLayoutConfiguration(
-    public val horizontalDistance: Float = 1.0f,
-    public val verticalDistance: Float = 1.0f,
-    public val orientation: Orientation = Orientation.TopToBottom,
-)
 
 /**
  * Computes a tidy tree layout using the Walker algorithm (Buchheim variant).

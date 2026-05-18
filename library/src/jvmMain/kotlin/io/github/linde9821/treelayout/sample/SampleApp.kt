@@ -2,8 +2,8 @@ package io.github.linde9821.treelayout.sample
 
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.TreeAdapter
-import io.github.linde9821.treelayout.WalkerLayoutConfiguration
-import io.github.linde9821.treelayout.WalkerTreeLayout
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 
 internal data class SampleNode(val name: String, val children: List<SampleNode> = emptyList())
 

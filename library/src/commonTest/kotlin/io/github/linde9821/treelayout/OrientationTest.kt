@@ -1,5 +1,7 @@
 package io.github.linde9821.treelayout
 
+import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
+import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
