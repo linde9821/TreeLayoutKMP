@@ -8,9 +8,9 @@ kotlin {
     sourceSets {
         jvmMain.dependencies {
             implementation(project(":library"))
-            implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.13.0")
-            implementation("org.jetbrains.lets-plot:lets-plot-image-export:4.8.2")
-            implementation("org.jetbrains.lets-plot:platf-awt:4.9.0")
+            implementation(libs.lets.plot.kotlin.jvm)
+            implementation(libs.lets.plot.image.export)
+            implementation(libs.lets.plot.platf.awt)
         }
         jvmTest.dependencies {
             implementation(libs.kotlin.test)
