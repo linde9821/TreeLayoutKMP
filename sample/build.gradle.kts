@@ -8,9 +8,18 @@ kotlin {
     jvm()
 
     sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material)
+            implementation(compose.ui)
+            implementation(project(":library"))
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(project(":library"))
         }
     }
 }

@@ -10,13 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -41,47 +44,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
-import io.github.linde9821.treelayout.TreeAdapter
 import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 
+private const val DEFAULT_INPUT: String = "Not all those who wander are lost"
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TreeVisualization() {
-    val tree = SampleNode(
-        "CEO", listOf(
-            SampleNode(
-                "Engineering", listOf(
-                    SampleNode("Frontend"),
-                    SampleNode("Backend"),
-                    SampleNode("Infra"),
-                )
-            ),
-            SampleNode("Design"),
-            SampleNode(
-                "Marketing", listOf(
-                    SampleNode("Growth"),
-                    SampleNode("Brand"),
-                )
-            ),
-        )
-    )
-
-    val adapter = remember {
-        object : TreeAdapter<SampleNode> {
-            private val parentMap = buildMap {
-                fun walk(node: SampleNode, parent: SampleNode?) {
-                    put(node, parent)
-                    node.children.forEach { walk(it, node) }
-                }
-                walk(tree, null)
-            }
-
-            override fun root(): SampleNode = tree
-            override fun children(node: SampleNode): List<SampleNode> = node.children
-            override fun parent(node: SampleNode): SampleNode? = parentMap[node]
-        }
-    }
-
+    var input by remember { mutableStateOf(DEFAULT_INPUT) }
     var horizontalDistance by remember { mutableStateOf(40f) }
     var verticalDistance by remember { mutableStateOf(60f) }
     var orientation by remember { mutableStateOf(Orientation.TopToBottom) }
@@ -89,26 +60,32 @@ fun TreeVisualization() {
     var nodePaddingV by remember { mutableStateOf(8f) }
     var orientationExpanded by remember { mutableStateOf(false) }
 
-    val textMeasurer = rememberTextMeasurer()
-    val textStyle = TextStyle(fontSize = 12.sp, color = Color.Black)
+    val words = input.lowercase().split("\\s+".toRegex())
+        .map { it.filter(Char::isLetter) }
+        .filter { it.isNotEmpty() }
+    val tree = buildPrefixTree(words)
+    val adapter = prefixTreeAdapter(tree)
 
-    // Pre-measure all labels to get actual text sizes
+    val textMeasurer = rememberTextMeasurer()
+    val textStyle = TextStyle(fontSize = 14.sp, color = Color.Black)
+
     val textLayouts = remember(tree) {
         buildMap {
-            fun walk(node: SampleNode) {
-                put(node, textMeasurer.measure(node.label, textStyle))
+            fun walk(node: PrefixNode) {
+                val display = node.label.ifEmpty { "·" }
+                put(node, textMeasurer.measure(display, textStyle))
                 node.children.forEach { walk(it) }
             }
             walk(tree)
         }
     }
 
-    val extents = object : NodeExtentProvider<SampleNode> {
-        override fun width(node: SampleNode): Float =
-            textLayouts[node]!!.size.width.toFloat() + nodePaddingH * 2
+    val extents = object : NodeExtentProvider<PrefixNode> {
+        override fun width(node: PrefixNode): Float =
+            (textLayouts[node]?.size?.width?.toFloat() ?: 0f) + nodePaddingH * 2
 
-        override fun height(node: SampleNode): Float =
-            textLayouts[node]!!.size.height.toFloat() + nodePaddingV * 2
+        override fun height(node: PrefixNode): Float =
+            (textLayouts[node]?.size?.height?.toFloat() ?: 0f) + nodePaddingV * 2
     }
 
     val config = WalkerLayoutConfiguration(
@@ -121,35 +98,35 @@ fun TreeVisualization() {
     val positions = result.getPositions()
 
     Row(modifier = Modifier.fillMaxSize()) {
-        // Controls panel
+        // Left: Controls
         Column(
-            modifier = Modifier.width(260.dp).fillMaxHeight().padding(16.dp),
+            modifier = Modifier.widthIn(min = 180.dp).width(220.dp).fillMaxHeight().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("Layout Controls", style = MaterialTheme.typography.h6)
+            Text("Layout Controls", style = MaterialTheme.typography.subtitle1)
 
-            Text("Horizontal Distance: ${"%.0f".format(horizontalDistance)}")
+            Text("Horizontal Distance: ${horizontalDistance.toInt()}")
             Slider(
                 value = horizontalDistance,
                 onValueChange = { horizontalDistance = it },
                 valueRange = 0f..200f,
             )
 
-            Text("Vertical Distance: ${"%.0f".format(verticalDistance)}")
+            Text("Vertical Distance: ${verticalDistance.toInt()}")
             Slider(
                 value = verticalDistance,
                 onValueChange = { verticalDistance = it },
                 valueRange = 0f..200f,
             )
 
-            Text("Node Padding H: ${"%.0f".format(nodePaddingH)}")
+            Text("Node Padding H: ${nodePaddingH.toInt()}")
             Slider(
                 value = nodePaddingH,
                 onValueChange = { nodePaddingH = it },
                 valueRange = 0f..40f,
             )
 
-            Text("Node Padding V: ${"%.0f".format(nodePaddingV)}")
+            Text("Node Padding V: ${nodePaddingV.toInt()}")
             Slider(
                 value = nodePaddingV,
                 onValueChange = { nodePaddingV = it },
@@ -179,12 +156,27 @@ fun TreeVisualization() {
 
         Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
 
-        // Tree canvas
+        // Middle: Input
+        Column(
+            modifier = Modifier.widthIn(min = 150.dp).width(200.dp).fillMaxHeight().padding(16.dp),
+        ) {
+            Text("Words (space-separated)", style = MaterialTheme.typography.subtitle1)
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                textStyle = TextStyle(fontSize = 13.sp),
+            )
+        }
+
+        Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+
+        // Right: Canvas
+
         var panOffset by remember { mutableStateOf(Offset.Zero) }
         var zoom by remember { mutableStateOf(1f) }
 
-        @OptIn(ExperimentalComposeUiApi::class)
-        (Canvas(
+        Canvas(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
@@ -204,10 +196,9 @@ fun TreeVisualization() {
             val centerY = size.height / 2f + panOffset.y
 
             scale(zoom, pivot = Offset(size.width / 2f, size.height / 2f)) {
-                // Draw edges
                 positions.forEach { (node, pos) ->
                     node.children.forEach { child ->
-                        val childPos = positions[child]!!
+                        val childPos = positions[child] ?: return@forEach
                         drawLine(
                             color = Color.Gray,
                             start = Offset(pos.x + centerX, pos.y + centerY),
@@ -217,11 +208,10 @@ fun TreeVisualization() {
                     }
                 }
 
-                // Draw nodes
                 positions.forEach { (node, pos) ->
+                    val textLayout = textLayouts[node] ?: return@forEach
                     val x = pos.x + centerX
                     val y = pos.y + centerY
-                    val textLayout = textLayouts[node]!!
                     val rectW = textLayout.size.width + nodePaddingH * 2
                     val rectH = textLayout.size.height + nodePaddingV * 2
 
@@ -234,10 +224,13 @@ fun TreeVisualization() {
 
                     drawText(
                         textLayoutResult = textLayout,
-                        topLeft = Offset(x - textLayout.size.width / 2f, y - textLayout.size.height / 2f),
+                        topLeft = Offset(
+                            x - textLayout.size.width / 2f,
+                            y - textLayout.size.height / 2f,
+                        ),
                     )
                 }
             }
-        })
+        }
     }
 }
