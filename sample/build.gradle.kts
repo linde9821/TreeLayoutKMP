@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 kotlin {
     jvm()
     listOf(
@@ -15,6 +16,10 @@ kotlin {
             baseName = "Sample"
             isStatic = true
         }
+    }
+    wasmJs {
+        browser()
+        binaries.executable()
     }
 
     sourceSets {
