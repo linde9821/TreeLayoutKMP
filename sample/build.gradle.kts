@@ -4,13 +4,37 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 kotlin {
     jvm()
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { target ->
+        target.binaries.framework {
+            baseName = "Sample"
+            isStatic = true
+        }
+    }
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
 
     sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.compose.runtime:runtime:1.10.3")
+            implementation("org.jetbrains.compose.foundation:foundation:1.10.3")
+            implementation("org.jetbrains.compose.material:material:1.10.3")
+            implementation("org.jetbrains.compose.ui:ui:1.10.3")
+            implementation(project(":library"))
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(project(":library"))
         }
     }
 }
