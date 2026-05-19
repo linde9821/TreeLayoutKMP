@@ -16,6 +16,9 @@ or iOS frameworks required.
 `TreeLayoutKMP` works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
 your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
 
+> **Note:** This library is a *layout engine*, not a rendering library. It outputs coordinates — how you draw the tree
+> (Canvas, SVG, Compose, HTML, etc.) is entirely up to you.
+
 **[Try the live demo on GitHub Pages](https://linde9821.github.io/TreeLayoutKMP/)**
 
 ## Supported Targets
