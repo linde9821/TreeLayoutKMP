@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml/badge.svg)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp-android)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp-android)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp)
 
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
@@ -10,7 +10,7 @@
 ![Tree Layout KMP Visualization Example](images/output.gif)
 
 A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
-the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android,
+the Walker algorithm (Buchheim–Jünger–Leipert variant) in $O(n)$ time with zero platform dependencies — no JVM, Android,
 or iOS frameworks required.
 
 TreeLayoutKMP works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
