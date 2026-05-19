@@ -2,18 +2,21 @@ package io.github.linde9821.treelayout.sample
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -27,15 +30,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -47,11 +48,8 @@ import io.github.linde9821.treelayout.Orientation
 import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 
-const val DEFAULT_INPUT: String = "Not all those who wander are lost"
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TreeVisualization() {
+public fun TreeVisualizationVertical() {
     var input by remember { mutableStateOf(DEFAULT_INPUT) }
     var horizontalDistance by remember { mutableStateOf(40f) }
     var verticalDistance by remember { mutableStateOf(60f) }
@@ -97,43 +95,46 @@ fun TreeVisualization() {
     val result = WalkerTreeLayout(adapter, config, extents).layout()
     val positions = result.getPositions()
 
-    Row(modifier = Modifier.fillMaxSize()) {
-        // Left: Controls
+    val focusManager = LocalFocusManager.current
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .safeDrawingPadding()
+        .imePadding()
+        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+            focusManager.clearFocus()
+        }
+        .padding(16.dp)
+    ) {
+        // Top: Controls + Input (scrollable)
         Column(
-            modifier = Modifier.widthIn(min = 180.dp).width(220.dp).fillMaxHeight().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(0.4f).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text("Layout Controls", style = MaterialTheme.typography.subtitle1)
 
-            Text("Horizontal Distance: ${horizontalDistance.toInt()}")
-            Slider(
-                value = horizontalDistance,
-                onValueChange = { horizontalDistance = it },
-                valueRange = 0f..200f,
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("H Distance: ${horizontalDistance.toInt()}", fontSize = 12.sp)
+                    Slider(value = horizontalDistance, onValueChange = { horizontalDistance = it }, valueRange = 0f..200f)
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("V Distance: ${verticalDistance.toInt()}", fontSize = 12.sp)
+                    Slider(value = verticalDistance, onValueChange = { verticalDistance = it }, valueRange = 0f..200f)
+                }
+            }
 
-            Text("Vertical Distance: ${verticalDistance.toInt()}")
-            Slider(
-                value = verticalDistance,
-                onValueChange = { verticalDistance = it },
-                valueRange = 0f..200f,
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Padding H: ${nodePaddingH.toInt()}", fontSize = 12.sp)
+                    Slider(value = nodePaddingH, onValueChange = { nodePaddingH = it }, valueRange = 0f..40f)
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Padding V: ${nodePaddingV.toInt()}", fontSize = 12.sp)
+                    Slider(value = nodePaddingV, onValueChange = { nodePaddingV = it }, valueRange = 0f..40f)
+                }
+            }
 
-            Text("Node Padding H: ${nodePaddingH.toInt()}")
-            Slider(
-                value = nodePaddingH,
-                onValueChange = { nodePaddingH = it },
-                valueRange = 0f..40f,
-            )
-
-            Text("Node Padding V: ${nodePaddingV.toInt()}")
-            Slider(
-                value = nodePaddingV,
-                onValueChange = { nodePaddingV = it },
-                valueRange = 0f..40f,
-            )
-
-            Text("Orientation:")
             Box {
                 OutlinedButton(onClick = { orientationExpanded = true }) {
                     Text(orientation.name)
@@ -146,45 +147,34 @@ fun TreeVisualization() {
                         DropdownMenuItem(onClick = {
                             orientation = o
                             orientationExpanded = false
-                        }) {
-                            Text(o.name)
-                        }
+                        }) { Text(o.name) }
                     }
                 }
             }
         }
 
-        Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Middle: Input
-        Column(
-            modifier = Modifier.widthIn(min = 150.dp).width(200.dp).fillMaxHeight().padding(16.dp),
-        ) {
-            Text("Words (space-separated)", style = MaterialTheme.typography.subtitle1)
-            OutlinedTextField(
-                value = input,
-                onValueChange = { input = it },
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                textStyle = TextStyle(fontSize = 13.sp),
-            )
-        }
+        OutlinedTextField(
+            value = input,
+            onValueChange = { input = it },
+            modifier = Modifier.fillMaxWidth().height(80.dp),
+            label = { Text("Words (space-separated)") },
+            textStyle = TextStyle(fontSize = 13.sp),
+        )
 
-        Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
 
-        // Right: Canvas
-
+        // Bottom: Canvas
         var panOffset by remember { mutableStateOf(Offset.Zero) }
         var zoom by remember { mutableStateOf(1f) }
 
         Canvas(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(0.6f)
                 .background(Color.White)
-                .border(2.dp, Color.Gray)
-                .onPointerEvent(PointerEventType.Scroll) { event ->
-                    val scrollDelta = event.changes.first().scrollDelta.y
-                    zoom = (zoom * if (scrollDelta > 0) 0.9f else 1.1f).coerceIn(0.1f, 5f)
-                }
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()

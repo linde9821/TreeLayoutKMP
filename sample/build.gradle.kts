@@ -6,6 +6,16 @@ plugins {
 
 kotlin {
     jvm()
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach { target ->
+        target.binaries.framework {
+            baseName = "Sample"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
