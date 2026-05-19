@@ -256,3 +256,7 @@ xcuserdata/
 .kiro
 *.gpg
 gradle.properties_local
+
+# Default ignored files
+/shelf/
+/workspace.xml
