@@ -223,6 +223,19 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
   as possible while preserving symmetry.
 - **Deterministic output** — the same tree always produces the same coordinates.
 
+## Benchmark
+
+The `benchmark/` module measures layout computation time across trees ranging from 1 to ~6 million nodes. Results
+confirm the algorithm's **O(n) linear time complexity** — computation time scales proportionally with node count.
+
+![Benchmark Results](benchmark/lets-plot-images/benchmark_results.png)
+
+Run the benchmark yourself:
+
+```bash
+./gradlew :benchmark:jvmRun
+```
+
 ## Running the Samples
 
 The `sample/` module is a Compose Multiplatform application that visualizes a **prefix tree** built from user-provided
