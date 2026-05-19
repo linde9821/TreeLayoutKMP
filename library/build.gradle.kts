@@ -104,12 +104,3 @@ mavenPublishing {
         }
     }
 }
-
-tasks.register<JavaExec>("runSample") {
-    description = "Runs the JVM sample application demonstrating tree layout"
-    val jvmJar = tasks.named("jvmJar")
-    dependsOn(jvmJar)
-    val runtimeClasspath = kotlin.jvm().compilations["main"].runtimeDependencyFiles
-    classpath = files(jvmJar.map { (it as Jar).archiveFile }, runtimeClasspath)
-    mainClass.set("io.github.linde9821.treelayout.sample.SampleAppKt")
-}

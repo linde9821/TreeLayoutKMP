@@ -10,11 +10,13 @@
 ![Tree Layout KMP Visualization Example](images/output.gif)
 
 A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
-the Walker algorithm (Buchheim–Jünger–Leipert variant) in $O(n)$ time with zero platform dependencies — no JVM, Android,
+the Walker algorithm (Buchheim–Jünger–Leipert variant) in O(n) time with zero platform dependencies — no JVM, Android,
 or iOS frameworks required.
 
-TreeLayoutKMP works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
+`TreeLayoutKMP` works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
 your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
+
+**[Try the live demo on GitHub Pages](https://linde9821.github.io/TreeLayoutKMP/)**
 
 ## Supported Targets
 
@@ -139,7 +141,7 @@ The layout engine uses node extents to compute center-to-center distances:
 
 ### 5. Layout Orientation
 
-By default the tree grows top-to-bottom. Use the `orientation` property to change direction:
+By default, the tree grows top-to-bottom. Use the `orientation` property to change direction:
 
 ```kotlin
 val config = WalkerLayoutConfiguration(
@@ -223,25 +225,39 @@ The layout is computed using the Buchheim–Jünger–Leipert improvement of the
 
 ## Running the Samples
 
-### Compose Desktop (interactive visualization)
+The `sample/` module is a Compose Multiplatform application that visualizes a **prefix tree** built from user-provided
+words. It demonstrates variable node sizes, all four orientations, and interactive layout controls.
 
-The `sample/` module contains a Compose Desktop application that renders an interactive tree visualization using the
-library.
+### Desktop (JVM)
 
 ```bash
 ./gradlew :sample:run
 ```
 
-This opens a window displaying an org-chart tree with variable node sizes and edges drawn between parent and child
-nodes.
+Opens a window with a side panel for layout controls, a text input for words, and a zoomable tree canvas.
 
-### JVM CLI (ASCII + PNG export)
-
-The library module includes a JVM sample that renders an ASCII visualization to the console and exports a PNG image.
+### Web (wasmJs)
 
 ```bash
-./gradlew :library:runSample
+./gradlew :sample:wasmJsBrowserRun
 ```
+
+Launches a local dev server and opens the sample in your browser. This is the same app deployed to GitHub Pages.
+
+### Android
+
+The standalone Android sample lives in `sample/android/`. Open it in Android Studio and run on a device or emulator, or
+build from the command line:
+
+```bash
+cd sample/android
+./gradlew installDebug
+```
+
+### iOS
+
+Open `sample/iosApp/iosApp.xcodeproj` in Xcode and run on a simulator or device. The shared Kotlin code is compiled
+into a static framework via the `:sample` module's iOS targets.
 
 ## License
 
