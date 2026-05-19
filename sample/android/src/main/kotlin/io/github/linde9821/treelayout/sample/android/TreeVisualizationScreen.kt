@@ -138,6 +138,7 @@ internal fun TreeVisualizationScreen() {
     val extents = object : NodeExtentProvider<PrefixNode> {
         override fun width(node: PrefixNode): Float =
             (textLayouts[node]?.size?.width?.toFloat() ?: 0f) + nodePaddingH * 2
+
         override fun height(node: PrefixNode): Float =
             (textLayouts[node]?.size?.height?.toFloat() ?: 0f) + nodePaddingV * 2
     }
@@ -157,41 +158,66 @@ internal fun TreeVisualizationScreen() {
             .fillMaxSize()
             .safeDrawingPadding()
             .imePadding()
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
                 focusManager.clearFocus()
             }
             .padding(16.dp)
     ) {
         Column(
-            modifier = Modifier.weight(0.4f).verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .weight(0.4f)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text("Layout Controls", style = MaterialTheme.typography.subtitle1)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("H Distance: ${horizontalDistance.toInt()}", fontSize = 12.sp)
-                    Slider(value = horizontalDistance, onValueChange = { horizontalDistance = it }, valueRange = 0f..200f)
+                    Slider(
+                        value = horizontalDistance,
+                        onValueChange = { horizontalDistance = it },
+                        valueRange = 0f..200f
+                    )
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("V Distance: ${verticalDistance.toInt()}", fontSize = 12.sp)
-                    Slider(value = verticalDistance, onValueChange = { verticalDistance = it }, valueRange = 0f..200f)
+                    Slider(
+                        value = verticalDistance,
+                        onValueChange = { verticalDistance = it },
+                        valueRange = 0f..200f
+                    )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Padding H: ${nodePaddingH.toInt()}", fontSize = 12.sp)
-                    Slider(value = nodePaddingH, onValueChange = { nodePaddingH = it }, valueRange = 0f..40f)
+                    Slider(
+                        value = nodePaddingH,
+                        onValueChange = { nodePaddingH = it },
+                        valueRange = 0f..40f
+                    )
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Padding V: ${nodePaddingV.toInt()}", fontSize = 12.sp)
-                    Slider(value = nodePaddingV, onValueChange = { nodePaddingV = it }, valueRange = 0f..40f)
+                    Slider(
+                        value = nodePaddingV,
+                        onValueChange = { nodePaddingV = it },
+                        valueRange = 0f..40f
+                    )
                 }
             }
             Box {
                 OutlinedButton(onClick = { orientationExpanded = true }) { Text(orientation.name) }
-                DropdownMenu(expanded = orientationExpanded, onDismissRequest = { orientationExpanded = false }) {
+                DropdownMenu(
+                    expanded = orientationExpanded,
+                    onDismissRequest = { orientationExpanded = false }) {
                     Orientation.entries.forEach { o ->
-                        DropdownMenuItem(onClick = { orientation = o; orientationExpanded = false }) { Text(o.name) }
+                        DropdownMenuItem(onClick = {
+                            orientation = o; orientationExpanded = false
+                        }) { Text(o.name) }
                     }
                 }
             }
@@ -202,7 +228,9 @@ internal fun TreeVisualizationScreen() {
         OutlinedTextField(
             value = input,
             onValueChange = { input = it },
-            modifier = Modifier.fillMaxWidth().height(80.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp),
             label = { Text("Words (space-separated)") },
             textStyle = TextStyle(fontSize = 13.sp),
         )
@@ -253,7 +281,10 @@ internal fun TreeVisualizationScreen() {
                 )
                 drawText(
                     textLayoutResult = textLayout,
-                    topLeft = Offset(x - textLayout.size.width / 2f, y - textLayout.size.height / 2f),
+                    topLeft = Offset(
+                        x - textLayout.size.width / 2f,
+                        y - textLayout.size.height / 2f
+                    ),
                 )
             }
         }
