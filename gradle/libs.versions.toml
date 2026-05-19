@@ -5,9 +5,15 @@ android-minSdk = "24"
 android-compileSdk = "36"
 vanniktechMavenPublish = "0.36.0"
 compose-version = "1.10.3"
+lets-plot-kotlin = "4.13.0"
+lets-plot = "4.8.2"
+lets-plot-platf = "4.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+lets-plot-kotlin-jvm = { module = "org.jetbrains.lets-plot:lets-plot-kotlin-jvm", version.ref = "lets-plot-kotlin" }
+lets-plot-image-export = { module = "org.jetbrains.lets-plot:lets-plot-image-export", version.ref = "lets-plot" }
+lets-plot-platf-awt = { module = "org.jetbrains.lets-plot:platf-awt", version.ref = "lets-plot-platf" }
 
 [plugins]
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }

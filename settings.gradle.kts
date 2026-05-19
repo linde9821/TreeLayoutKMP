@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TreeLayoutKMP"
-include(":library", ":sample")
+include(":library", ":sample", ":benchmark")
