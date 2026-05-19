@@ -35,11 +35,19 @@ public fun LayoutControls(
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("H Distance: ${state.horizontalDistance.toInt()}", fontSize = 12.sp)
-                    Slider(value = state.horizontalDistance, onValueChange = state.onHorizontalDistanceChange, valueRange = 0f..200f)
+                    Slider(
+                        value = state.horizontalDistance,
+                        onValueChange = state.onHorizontalDistanceChange,
+                        valueRange = 0f..200f
+                    )
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text("V Distance: ${state.verticalDistance.toInt()}", fontSize = 12.sp)
-                    Slider(value = state.verticalDistance, onValueChange = state.onVerticalDistanceChange, valueRange = 0f..200f)
+                    Slider(
+                        value = state.verticalDistance,
+                        onValueChange = state.onVerticalDistanceChange,
+                        valueRange = 0f..200f
+                    )
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -54,9 +62,17 @@ public fun LayoutControls(
             }
         } else {
             Text("Horizontal Distance: ${state.horizontalDistance.toInt()}")
-            Slider(value = state.horizontalDistance, onValueChange = state.onHorizontalDistanceChange, valueRange = 0f..200f)
+            Slider(
+                value = state.horizontalDistance,
+                onValueChange = state.onHorizontalDistanceChange,
+                valueRange = 0f..200f
+            )
             Text("Vertical Distance: ${state.verticalDistance.toInt()}")
-            Slider(value = state.verticalDistance, onValueChange = state.onVerticalDistanceChange, valueRange = 0f..200f)
+            Slider(
+                value = state.verticalDistance,
+                onValueChange = state.onVerticalDistanceChange,
+                valueRange = 0f..200f
+            )
             Text("Node Padding H: ${state.nodePaddingH.toInt()}")
             Slider(value = state.nodePaddingH, onValueChange = state.onNodePaddingHChange, valueRange = 0f..40f)
             Text("Node Padding V: ${state.nodePaddingV.toInt()}")

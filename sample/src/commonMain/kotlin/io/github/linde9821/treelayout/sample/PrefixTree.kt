@@ -34,9 +34,11 @@ private fun insertWord(root: PrefixNode, word: String) {
                     common++
                 }
                 // Split the existing node
-                val splitNode = PrefixNode(partial.label.substring(0, common), mutableListOf(
-                    PrefixNode(partial.label.substring(common), partial.children)
-                ))
+                val splitNode = PrefixNode(
+                    partial.label.substring(0, common), mutableListOf(
+                        PrefixNode(partial.label.substring(common), partial.children)
+                    )
+                )
                 current.children[current.children.indexOf(partial)] = splitNode
                 if (i + common < word.length) {
                     splitNode.children.add(PrefixNode(word.substring(i + common)))
