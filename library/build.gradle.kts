@@ -13,8 +13,16 @@ version = "0.2.1"
 
 kotlin {
     explicitApi()
-    jvmToolchain(8)
-    jvm()
+    jvmToolchain(17)
+    jvm {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+                }
+            }
+        }
+    }
     android {
         namespace = "org.github.linde9821.treelayout"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
