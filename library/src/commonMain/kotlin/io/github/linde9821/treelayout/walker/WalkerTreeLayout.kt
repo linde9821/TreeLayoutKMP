@@ -62,6 +62,7 @@ private class LayoutContext<T>(
     // Precomputed structural info
     private val depthOf = HashMap<T, Int>()
     private val indexAmongSiblings = HashMap<T, Int>()
+    private val childrenOf = HashMap<T, List<T>>()
 
     // Precomputed max height per depth level for vertical positioning
     private val maxHeightAtDepth = HashMap<Int, Float>()
@@ -90,6 +91,7 @@ private class LayoutContext<T>(
         maxHeightAtDepth[depth] = max(maxHeightAtDepth[depth] ?: 0f, h)
 
         val children = adapter.children(node)
+        childrenOf[node] = children
         children.forEachIndexed { index, child ->
             indexAmongSiblings[child] = index
             initNodes(child, depth + 1)
@@ -102,7 +104,7 @@ private class LayoutContext<T>(
     }
 
     private fun firstWalk(v: T) {
-        val children = adapter.children(v)
+        val children = childrenOf[v]!!
         if (children.isEmpty()) {
             prelim[v] = 0f
             val w = leftSibling(v)
@@ -180,7 +182,7 @@ private class LayoutContext<T>(
     private fun executeShifts(v: T) {
         var shift = 0f
         var change = 0f
-        for (w in adapter.children(v).reversed()) {
+        for (w in childrenOf[v]!!.reversed()) {
             prelim[w] = prelim[w]!! + shift
             modifiers[w] = modifiers[w]!! + shift
             change += changes[w]!!
@@ -213,7 +215,7 @@ private class LayoutContext<T>(
         }
         maxDepth = max(maxDepth, depth)
 
-        for (w in adapter.children(v)) {
+        for (w in childrenOf[v]!!) {
             secondWalk(w, m + modifiers[v]!!)
         }
     }
@@ -224,25 +226,25 @@ private class LayoutContext<T>(
     }
 
     private fun nextLeft(v: T): T? {
-        val children = adapter.children(v)
+        val children = childrenOf[v]!!
         return if (children.isNotEmpty()) children.first() else threads[v]
     }
 
     private fun nextRight(v: T): T? {
-        val children = adapter.children(v)
+        val children = childrenOf[v]!!
         return if (children.isNotEmpty()) children.last() else threads[v]
     }
 
     private fun leftSibling(v: T): T? {
         val parent = adapter.parent(v) ?: return null
-        val siblings = adapter.children(parent)
+        val siblings = childrenOf[parent]!!
         val idx = indexAmongSiblings[v] ?: return null
         return if (idx > 0) siblings[idx - 1] else null
     }
 
     private fun leftmostSibling(v: T): T? {
         val parent = adapter.parent(v) ?: return null
-        return adapter.children(parent).first()
+        return childrenOf[parent]!!.first()
     }
 
     private fun numberOf(v: T): Int = (indexAmongSiblings[v] ?: 0) + 1
