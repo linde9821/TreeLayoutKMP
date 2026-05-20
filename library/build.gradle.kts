@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -10,10 +9,11 @@ plugins {
 }
 
 group = "io.github.linde9821"
-version = "0.2.0"
+version = "0.2.1"
 
 kotlin {
     explicitApi()
+    jvmToolchain(8)
     jvm()
     android {
         namespace = "org.github.linde9821.treelayout"
@@ -24,21 +24,18 @@ kotlin {
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
         }
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(
-                        JvmTarget.JVM_11
-                    )
-                }
-            }
-        }
     }
+    linuxX64()
+    mingwX64()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
+    macosArm64()
+    tvosArm64()
+    tvosSimulatorArm64()
+    watchosArm32()
+    watchosArm64()
+    watchosSimulatorArm64()
     val useChrome = System.getenv("CI") == "true"
     js {
         browser {
@@ -48,6 +45,7 @@ kotlin {
                 }
             }
         }
+        nodejs()
     }
     wasmJs {
         browser {
@@ -57,6 +55,7 @@ kotlin {
                 }
             }
         }
+        nodejs()
     }
 
     sourceSets {
