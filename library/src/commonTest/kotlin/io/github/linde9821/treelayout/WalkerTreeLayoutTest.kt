@@ -202,4 +202,29 @@ class WalkerTreeLayoutTest {
             assertTrue(positions[i] > positions[i - 1], "Children should be ordered left to right")
         }
     }
+
+    @Test
+    fun nonDeterministicAdapterProducesCorrectLayout() {
+        // Adapter that returns a new list instance on every children() call.
+        // Before the childrenOf cache fix, this would cause index-out-of-bounds or wrong results.
+        val tree = StringTreeBuilder().root("root")
+            .addChild("root", "a")
+            .addChild("root", "b")
+            .addChild("a", "c")
+            .addChild("a", "d")
+
+        val adapter = object : TreeAdapter<String> {
+            override fun root(): String = tree.root
+            override fun children(node: String): List<String> =
+                tree.childrenMap[node]?.toList() ?: emptyList() // new list each call
+            override fun parent(node: String): String? = tree.parentMap[node]
+        }
+
+        val result = WalkerTreeLayout(adapter).layout()
+
+        assertEquals(5, result.getPositions().size)
+        val posC = result.getPosition("c")
+        val posD = result.getPosition("d")
+        assertTrue(posD.x > posC.x, "Siblings should be ordered: c.x=${posC.x}, d.x=${posD.x}")
+    }
 }

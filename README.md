@@ -9,7 +9,9 @@
 
 ![Tree Layout KMP Visualization Example](images/output.gif)
 
-A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements the [Walker algorithm (Buchheim–Jünger–Leipert variant)](https://link.springer.com/chapter/10.1007/3-540-36151-0_32) in $O(n)$ time with zero platform dependencies — no JVM, Android, or iOS frameworks required.
+A pure **Kotlin Multiplatform** library for computing tidy, aesthetically pleasing tree visualizations. It implements
+the [Walker algorithm (Buchheim–Jünger–Leipert variant)](https://link.springer.com/chapter/10.1007/3-540-36151-0_32)
+in $O(n)$ time with zero platform dependencies — no JVM, Android, or iOS frameworks required.
 
 `TreeLayoutKMP` works with *any* tree structure you already have. You provide a thin adapter describing how to traverse
 your nodes; the library computes optimal (x, y) coordinates for every node in the tree.
@@ -21,16 +23,16 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 
 ## Supported Targets
 
-| JVM | Android | iOS | Linux x64 | wasmJs | js |
-|:---:|:-------:|:---:|:---------:|:-------|:---|
-|  ✅  |    ✅    |  ✅  |     ✅     | ✅      | ✅  |
+| JVM | Android | iOS | macOS | tvOS | watchOS | Linux | Windows | JS | Wasm |
+|:---:|:-------:|:---:|:-----:|:----:|:-------:|:-----:|:-------:|:--:|:----:|
+|  ✅  |    ✅    |  ✅  |   ✅   |  ✅   |    ✅    |   ✅   |    ✅    | ✅  |  ✅   |
 
 ## Installation
 
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.2.0")
+    implementation("io.github.linde9821:treelayout-kmp:0.2.1")
 }
 ```
 
@@ -253,7 +255,7 @@ Opens a window with a side panel for layout controls, a text input for words, an
 ### Web (wasmJs)
 
 ```bash
-./gradlew :sample:wasmJsBrowserRun
+./gradlew :sample:wasmJsBrowserProductionRun
 ```
 
 Launches a local dev server and opens the sample in your browser. This is the same app deployed to GitHub Pages.
