@@ -17,13 +17,14 @@ android {
     buildFeatures {
         compose = true
     }
+    compileSdkMinor = 0
 }
 
 dependencies {
     implementation("io.github.linde9821:treelayout-kmp:0.2.0")
     implementation("androidx.activity:activity-compose:1.13.0")
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material)
-    implementation(compose.ui)
+    implementation("org.jetbrains.compose.runtime:runtime:1.11.0")
+    implementation("org.jetbrains.compose.foundation:foundation:1.11.0")
+    implementation("org.jetbrains.compose.material:material:1.11.0")
+    implementation("org.jetbrains.compose.ui:ui:1.11.0")
 }

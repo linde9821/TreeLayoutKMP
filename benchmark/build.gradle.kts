@@ -22,6 +22,6 @@ tasks.register<JavaExec>("runBenchmark") {
     description = "Run the TreeLayoutKMP benchmark"
     mainClass.set("io.github.linde9821.treelayout.benchmark.MainKt")
     classpath = kotlin.jvm().compilations["main"].runtimeDependencyFiles +
-        kotlin.jvm().compilations["main"].output.allOutputs
+            kotlin.jvm().compilations["main"].output.allOutputs
     jvmArgs = listOf("-Xmx8g", "-XX:+UseG1GC", "-XX:+AlwaysPreTouch")
 }

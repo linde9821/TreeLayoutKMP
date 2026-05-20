@@ -12,7 +12,6 @@ import org.jetbrains.letsPlot.label.ylab
 import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.letsPlot.scale.scaleColorManual
 import org.jetbrains.letsPlot.scale.scaleLinetypeManual
-import org.jetbrains.letsPlot.scale.scaleSizeManual
 import org.jetbrains.letsPlot.themes.themeMinimal
 import kotlin.time.measureTime
 
@@ -123,16 +122,16 @@ fun main() {
     val os = System.getProperty("os.name")
 
     val plot = letsPlot(data) { x = "nodes"; y = "time_ms" } +
-        geomLine(data = referenceData) { color = "series"; linetype = "series" } +
-        geomLine(data = measuredData) { color = "series"; linetype = "series" } +
-        geomPoint(data = measuredData, size = 1.5) { color = "series" } +
-        scaleColorManual(values = listOf("#999999", "#2166AC")) +
-        scaleLinetypeManual(values = listOf("dashed", "solid")) +
-        xlab("Number of Nodes") +
-        ylab("Time (ms)") +
-        labs(subtitle = "JVM $jvmVersion · $os") +
-        ggtitle("TreeLayoutKMP Benchmark") +
-        themeMinimal()
+            geomLine(data = referenceData) { color = "series"; linetype = "series" } +
+            geomLine(data = measuredData) { color = "series"; linetype = "series" } +
+            geomPoint(data = measuredData, size = 1.5) { color = "series" } +
+            scaleColorManual(values = listOf("#999999", "#2166AC")) +
+            scaleLinetypeManual(values = listOf("dashed", "solid")) +
+            xlab("Number of Nodes") +
+            ylab("Time (ms)") +
+            labs(subtitle = "JVM $jvmVersion · $os") +
+            ggtitle("TreeLayoutKMP Benchmark") +
+            themeMinimal()
 
     ggsave(plot, "benchmark_results.png", dpi = 150, w = 10.0, h = 6.0)
     println("\nChart written to benchmark_results.png")
