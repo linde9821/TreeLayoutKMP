@@ -4,6 +4,8 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp)
 
+**[Live Demo](https://linde9821.github.io/TreeLayoutKMP/)** · **[API Docs](https://linde9821.github.io/TreeLayoutKMP/api/)**
+
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
 
@@ -18,8 +20,6 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 
 > **Note:** This library is a *layout engine*, not a rendering library. It outputs coordinates — how you draw the tree
 > (Canvas, SVG, Compose, HTML, etc.) is entirely up to you.
-
-**[Try the live demo on GitHub Pages](https://linde9821.github.io/TreeLayoutKMP/)**
 
 ## Supported Targets
 
