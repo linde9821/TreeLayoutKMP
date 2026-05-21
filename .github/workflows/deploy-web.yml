@@ -1,43 +1,12 @@
-name: Deploy Web Sample
+# Superseded by deploy-docs.yml which deploys both the sample and API docs.
+# Kept as a placeholder to avoid breaking existing workflow references.
+name: Deploy Web Sample (deprecated)
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
-  deploy:
+  redirect:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 17
-
-      - uses: gradle/actions/setup-gradle@v4
-
-      - name: Build wasmJs distribution
-        run: ./gradlew :sample:wasmJsBrowserDistribution
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: sample/build/dist/wasmJs/productionExecutable
-
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - run: echo "Use deploy-docs.yml instead"
