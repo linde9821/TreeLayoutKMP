@@ -2,6 +2,10 @@ package io.github.linde9821.treelayout.sample
 
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
+import io.github.linde9821.treelayout.radial.angular.DirectAngularPlacementConfiguration
+import io.github.linde9821.treelayout.radial.angular.DirectAngularPlacementLayout
+import io.github.linde9821.treelayout.radial.walker.RadialWalkerLayoutConfiguration
+import io.github.linde9821.treelayout.radial.walker.RadialWalkerTreeLayout
 import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 import kotlin.test.Test
@@ -27,7 +31,6 @@ public class SharedVisualizationTest {
         val result = WalkerTreeLayout(adapter, config, fixedExtents).layout()
         val positions = result.getPositions()
 
-        // root + "ca" + "t" + "r" = 4 nodes
         assertEquals(4, positions.size)
     }
 
@@ -45,6 +48,26 @@ public class SharedVisualizationTest {
             val result = WalkerTreeLayout(adapter, config, fixedExtents).layout()
             assertTrue(result.getPositions().isNotEmpty(), "No positions for $orientation")
         }
+    }
+
+    @Test
+    public fun radialWalkerProducesPositionsForAllNodes() {
+        val tree = buildPrefixTree(listOf("cat", "car"))
+        val adapter = prefixTreeAdapter(tree)
+        val config = RadialWalkerLayoutConfiguration(layerDistance = 80f, margin = 0.5f)
+        val result = RadialWalkerTreeLayout(adapter, config, fixedExtents).layout()
+
+        assertEquals(4, result.getPositions().size)
+    }
+
+    @Test
+    public fun directAngularProducesPositionsForAllNodes() {
+        val tree = buildPrefixTree(listOf("cat", "car"))
+        val adapter = prefixTreeAdapter(tree)
+        val config = DirectAngularPlacementConfiguration(layerDistance = 80f)
+        val result = DirectAngularPlacementLayout(adapter, config).layout()
+
+        assertEquals(4, result.getPositions().size)
     }
 
     @Test
