@@ -3,6 +3,7 @@ package io.github.linde9821.treelayout.sample
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +38,14 @@ public fun TreeCanvas(
     val currentZoom by rememberUpdatedState(effectiveZoom)
     val currentOnZoomChange by rememberUpdatedState(onZoomChange)
 
+    val nodeColor = MaterialTheme.colors.primary
+    val edgeColor = MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+    val canvasBackground = MaterialTheme.colors.background
+
     Canvas(
         modifier = modifier
             .clipToBounds()
-            .background(Color.White)
+            .background(canvasBackground)
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, gestureZoom, _ ->
                     panOffset += pan
@@ -61,10 +66,10 @@ public fun TreeCanvas(
                 node.children.forEach { child ->
                     val childPos = positions[child] ?: return@forEach
                     drawLine(
-                        color = Color.Gray,
+                        color = edgeColor,
                         start = Offset(pos.x + centerX, pos.y + centerY),
                         end = Offset(childPos.x + centerX, childPos.y + centerY),
-                        strokeWidth = 2f / effectiveZoom,
+                        strokeWidth = 1.5f / effectiveZoom,
                     )
                 }
             }
@@ -77,10 +82,10 @@ public fun TreeCanvas(
                 val rectH = textLayout.size.height + nodePaddingV * 2
 
                 drawRoundRect(
-                    color = Color(0xFF4CAF50),
+                    color = nodeColor,
                     topLeft = Offset(x - rectW / 2f, y - rectH / 2f),
                     size = Size(rectW, rectH),
-                    cornerRadius = CornerRadius(6f, 6f),
+                    cornerRadius = CornerRadius(8f, 8f),
                 )
 
                 drawText(
@@ -89,6 +94,7 @@ public fun TreeCanvas(
                         x - textLayout.size.width / 2f,
                         y - textLayout.size.height / 2f,
                     ),
+                    color = Color(0xFF0F172A),
                 )
             }
         }

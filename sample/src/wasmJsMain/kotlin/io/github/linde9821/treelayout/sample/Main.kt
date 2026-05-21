@@ -1,6 +1,5 @@
 package io.github.linde9821.treelayout.sample
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
@@ -9,8 +8,6 @@ import kotlinx.browser.document
 public fun main() {
     val root = document.getElementById("root") ?: return
     ComposeViewport(root) {
-        MaterialTheme {
-            TreeVisualization()
-        }
+        TreeVisualization()
     }
 }
