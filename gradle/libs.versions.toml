@@ -8,7 +8,7 @@ compose-version = "1.11.0"
 lets-plot-kotlin = "4.13.0"
 lets-plot = "4.8.2"
 lets-plot-platf = "4.9.0"
-dokka = "2.0.0"
+dokka = "2.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
