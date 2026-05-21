@@ -16,8 +16,6 @@ import kotlin.math.sin
  * Each child receives a share of its parent's angular sector proportional to
  * its subtree weight (number of descendants including itself).
  *
- * Runs in O(n): one pass to compute weights, one pass to assign positions.
- *
  * @param T The node type of the external tree.
  * @param adapter Adapter providing tree traversal over the external structure.
  * @param configuration Layout spacing parameters.
