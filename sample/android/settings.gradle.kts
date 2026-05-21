@@ -14,3 +14,9 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TreeLayoutKMP-Android-Sample"
+
+includeBuild("../..") {
+    dependencySubstitution {
+        substitute(module("io.github.linde9821:treelayout-kmp")).using(project(":library"))
+    }
+}
