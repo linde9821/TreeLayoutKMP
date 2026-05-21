@@ -32,7 +32,7 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.2.1")
+    implementation("io.github.linde9821:treelayout-kmp:0.3.0")
 }
 ```
 
