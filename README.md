@@ -158,6 +158,83 @@ val result = WalkerTreeLayout(adapter, config).layout()
 
 Available orientations: `TopToBottom`, `BottomToTop`, `LeftToRight`, `RightToLeft`.
 
+## Radial Layouts
+
+In addition to the linear Walker layout, the library includes two **radial layout algorithms** that arrange nodes in
+concentric circles around the root. These are useful when you want a compact, center-outward visualization — common for
+org charts, file explorers, and dependency graphs.
+
+### Radial Walker Layout
+
+**Package:** `io.github.linde9821.treelayout.radial.walker`
+
+This algorithm runs the Walker algorithm internally to determine sibling ordering and spacing, then maps the across-axis
+(horizontal positions) to angular positions on concentric rings. Each depth level becomes a ring at radius
+`depth × layerDistance`.
+
+```kotlin
+import io.github.linde9821.treelayout.radial.walker.RadialWalkerTreeLayout
+import io.github.linde9821.treelayout.radial.walker.RadialWalkerLayoutConfiguration
+
+val config = RadialWalkerLayoutConfiguration(
+    layerDistance = 80f,
+    margin = 0.5f,    // radians subtracted from full circle to create a gap
+    rotation = 0.0f,  // angular offset in radians
+)
+
+val result = RadialWalkerTreeLayout(
+    adapter = OrgTreeAdapter(ceo),
+    configuration = config,
+).layout()
+
+result.getPositions().forEach { (node, point) ->
+    println("${node.name} -> (${point.x}, ${point.y})")
+}
+```
+
+The constructor accepts an optional `nodeExtentProvider` parameter, which is forwarded to the internal Walker pass for
+variable-width node spacing:
+
+```kotlin
+val result = RadialWalkerTreeLayout(
+    adapter = OrgTreeAdapter(ceo),
+    configuration = config,
+    nodeExtentProvider = OrgExtentProvider(),
+).layout()
+```
+
+### Direct Angular Placement Layout
+
+**Package:** `io.github.linde9821.treelayout.radial.angular`
+
+This algorithm recursively partitions angular space among children proportional to their **subtree weight** (total number
+of descendants including the child itself). It runs in **O(n)** — one pass to compute weights, one pass to assign
+positions. This produces evenly distributed layouts where larger subtrees receive proportionally more angular space.
+
+```kotlin
+import io.github.linde9821.treelayout.radial.angular.DirectAngularPlacementLayout
+import io.github.linde9821.treelayout.radial.angular.DirectAngularPlacementConfiguration
+
+val config = DirectAngularPlacementConfiguration(
+    layerDistance = 80f,
+    rotation = 0.0f,  // angular offset in radians
+)
+
+val result = DirectAngularPlacementLayout(
+    adapter = OrgTreeAdapter(ceo),
+    configuration = config,
+).layout()
+
+result.getPositions().forEach { (node, point) ->
+    println("${node.name} -> (${point.x}, ${point.y})")
+}
+```
+
+> **When to choose which?**  
+> Use **Radial Walker** when you want the Walker algorithm's aesthetic guarantees (symmetry, minimal width) projected
+> onto a circle. Use **Direct Angular Placement** when you want a simpler, weight-proportional distribution with no
+> dependency on the Walker pass.
+
 ## API Reference
 
 ### `TreeAdapter<T>`
@@ -202,6 +279,38 @@ Available orientations: `TopToBottom`, `BottomToTop`, `LeftToRight`, `RightToLef
 Constructor accepts an optional `nodeExtentProvider` parameter. When omitted, nodes are treated as dimensionless points
 (backward compatible).
 
+### `RadialWalkerLayoutConfiguration`
+
+| Property        | Type    | Default | Description                                                    |
+|-----------------|---------|---------|----------------------------------------------------------------|
+| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.                |
+| `margin`        | `Float` | `0.0f`  | Angular margin (in radians) subtracted from the full circle.   |
+| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions.     |
+
+### `RadialWalkerTreeLayout<T>`
+
+| Method                          | Description                                          |
+|---------------------------------|------------------------------------------------------|
+| `layout(): TreeLayoutResult<T>` | Executes the algorithm and returns positioned nodes. |
+
+Constructor parameters: `adapter: TreeAdapter<T>`, `configuration: RadialWalkerLayoutConfiguration`,
+`nodeExtentProvider: NodeExtentProvider<T>` (optional, defaults to dimensionless points).
+
+### `DirectAngularPlacementConfiguration`
+
+| Property        | Type    | Default | Description                                                |
+|-----------------|---------|---------|-------------------------------------------------------------|
+| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.             |
+| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions.  |
+
+### `DirectAngularPlacementLayout<T>`
+
+| Method                          | Description                                          |
+|---------------------------------|------------------------------------------------------|
+| `layout(): TreeLayoutResult<T>` | Executes the algorithm and returns positioned nodes. |
+
+Constructor parameters: `adapter: TreeAdapter<T>`, `configuration: DirectAngularPlacementConfiguration`.
+
 ### `TreeLayoutResult<T>`
 
 | Method                          | Description                                     |
@@ -242,7 +351,9 @@ Run the benchmark yourself:
 ## Running the Samples
 
 The `sample/` module is a Compose Multiplatform application that visualizes a **prefix tree** built from user-provided
-words. It demonstrates variable node sizes, all four orientations, and interactive layout controls.
+words. It features a dark-themed UI with a **layout type selector** (Walker / RadialWalker / DirectAngular) and
+context-sensitive controls for each algorithm — orientation for Walker, margin and rotation for radial layouts. It
+demonstrates variable node sizes and interactive layout controls.
 
 ### Desktop (JVM)
 
