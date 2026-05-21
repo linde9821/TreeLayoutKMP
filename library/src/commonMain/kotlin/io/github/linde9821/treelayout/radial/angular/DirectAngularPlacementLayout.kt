@@ -2,7 +2,7 @@ package io.github.linde9821.treelayout.radial.angular
 
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
-import io.github.linde9821.treelayout.TreeLayoutResult
+import io.github.linde9821.treelayout.result.TreeLayoutResult
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.max
@@ -77,7 +77,7 @@ public class DirectAngularPlacementLayout<T>(
 private class DirectAngularResult<T>(
     private val positions: Map<T, Point>,
     private val maxDepth: Int,
-) : TreeLayoutResult<T> {
+) : TreeLayoutResult<T>() {
     override fun getPosition(node: T): Point =
         positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
 
