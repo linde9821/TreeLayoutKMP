@@ -3,7 +3,7 @@ package io.github.linde9821.treelayout.radial.walker
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
-import io.github.linde9821.treelayout.TreeLayoutResult
+import io.github.linde9821.treelayout.result.TreeLayoutResult
 import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.walker.WalkerTreeLayout
 import kotlin.math.cos
@@ -89,7 +89,7 @@ private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
 private class RadialLayoutResult<T>(
     private val positions: Map<T, Point>,
     private val maxDepth: Int,
-) : TreeLayoutResult<T> {
+) : TreeLayoutResult<T>() {
     override fun getPosition(node: T): Point =
         positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
 
