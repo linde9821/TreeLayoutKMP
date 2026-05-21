@@ -62,7 +62,7 @@ public fun TreeVisualization() {
             nodePaddingH = state.nodePaddingH,
             nodePaddingV = state.nodePaddingV,
             zoom = zoom,
-            onZoomChange = null,
+            onZoomChange = { zoom = it },
             modifier = Modifier
                 .fillMaxSize()
                 .border(2.dp, androidx.compose.ui.graphics.Color.Gray)
