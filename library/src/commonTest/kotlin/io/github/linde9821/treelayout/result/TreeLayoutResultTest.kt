@@ -108,4 +108,21 @@ class TreeLayoutResultTest {
         assertEquals(5, r.translated(1f, 1f).getMaxDepth())
         assertEquals(5, r.scaledTo(100f, 100f).getMaxDepth())
     }
+
+    @Test
+    fun centeredPlacesLayoutInMiddleOfViewport() {
+        // Layout spans 0..10 x 0..20 → scaledTo 100x100 → factor=5 → becomes 50x100
+        // Centered in 100x100: dx = (100-50)/2 = 25, dy = (100-100)/2 = 0
+        val r = result("a" to Point(0f, 0f), "b" to Point(10f, 20f))
+        val c = r.centered(100f, 100f)
+        assertEquals(Point(25f, 0f), c.getPosition("a"))
+        assertEquals(Point(75f, 100f), c.getPosition("b"))
+    }
+
+    @Test
+    fun centeredSingleNodePlacesAtCenter() {
+        val r = result("a" to Point(5f, 5f))
+        val c = r.centered(200f, 100f)
+        assertEquals(Point(100f, 50f), c.getPosition("a"))
+    }
 }

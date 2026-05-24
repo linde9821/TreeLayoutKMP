@@ -13,6 +13,8 @@ public class TreeLayoutResult<T>(
     private val positions: Map<T, Point>,
     private val maxDepth: Int,
 ) {
+    public companion object {}
+
     /** Returns the position assigned to [node]. */
     public fun getPosition(node: T): Point =
         positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
@@ -74,5 +76,18 @@ public class TreeLayoutResult<T>(
             },
             maxDepth,
         )
+    }
+
+    /**
+     * Returns a new result centered within a viewport of [width]×[height].
+     * The layout is first scaled to fit (preserving aspect ratio), then offset
+     * so that the bounding box is centered in the viewport.
+     */
+    public fun centered(width: Float, height: Float): TreeLayoutResult<T> {
+        val scaled = scaledTo(width, height)
+        val bounds = scaled.getBounds()
+        val dx = (width - bounds.width) / 2f - bounds.minX
+        val dy = (height - bounds.height) / 2f - bounds.minY
+        return scaled.translated(dx, dy)
     }
 }
