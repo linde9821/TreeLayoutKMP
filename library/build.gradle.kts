@@ -14,7 +14,17 @@ version = "0.4.0"
 
 dokka {
     moduleName.set("TreeLayoutKMP")
+
+    dokkaSourceSets.configureEach {
+        includes.from("src/commonMain/kotlin/io/github/linde9821/treelayout/Module.md")
+        sourceLink {
+            localDirectory.set(file("src/commonMain/kotlin"))
+            remoteUrl("https://github.com/linde9821/TreeLayoutKMP/blob/main/library/src/commonMain/kotlin")
+            remoteLineSuffix.set("#L")
+        }
+    }
 }
+
 kotlin {
     explicitApi()
     jvmToolchain(17)
