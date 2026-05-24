@@ -1,10 +1,8 @@
 # TreeLayoutKMP
 
 [![CI](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml/badge.svg)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/linde9821/COVERAGE_GIST_ID/raw/coverage.json)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp)
-
-**[Live Demo](https://linde9821.github.io/TreeLayoutKMP/)** · *
+**[Live Demo](https://linde9821.github.io/TreeLayoutKMP/)** · 
 *[API Docs](https://linde9821.github.io/TreeLayoutKMP/api/)**
 
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
