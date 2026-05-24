@@ -88,8 +88,22 @@ class TreeLayoutResultTest {
     }
 
     @Test
+    fun mappedAppliesTransformToAllPositions() {
+        val r = result("a" to Point(1f, 2f), "b" to Point(3f, 4f))
+        val m = r.mapped { Point(it.x * 2f, it.y + 10f) }
+        assertEquals(Point(2f, 12f), m.getPosition("a"))
+        assertEquals(Point(6f, 14f), m.getPosition("b"))
+    }
+
+    @Test
+    fun mappedPreservesMaxDepth() {
+        val r = TreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 7)
+        assertEquals(7, r.mapped { it }.getMaxDepth())
+    }
+
+    @Test
     fun maxDepthIsPreservedThroughTransformations() {
-        val r = MapTreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 5)
+        val r = TreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 5)
         assertEquals(5, r.normalized().getMaxDepth())
         assertEquals(5, r.translated(1f, 1f).getMaxDepth())
         assertEquals(5, r.scaledTo(100f, 100f).getMaxDepth())

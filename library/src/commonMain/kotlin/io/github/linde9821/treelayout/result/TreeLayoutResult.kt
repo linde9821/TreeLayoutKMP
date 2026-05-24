@@ -9,26 +9,29 @@ import kotlin.math.min
  *
  * @param T The node type of the external tree.
  */
-public abstract class TreeLayoutResult<T> {
-
+public class TreeLayoutResult<T>(
+    private val positions: Map<T, Point>,
+    private val maxDepth: Int,
+) {
     /** Returns the position assigned to [node]. */
-    public abstract fun getPosition(node: T): Point
+    public fun getPosition(node: T): Point =
+        positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
 
     /** Returns all node-to-position mappings. */
-    public abstract fun getPositions(): Map<T, Point>
+    public fun getPositions(): Map<T, Point> = positions
 
     /** Returns the maximum depth of the tree. */
-    public abstract fun getMaxDepth(): Int
+    public fun getMaxDepth(): Int = maxDepth
 
     /** Returns the axis-aligned bounding box of all node positions. */
     public fun getBounds(): Bounds {
-        val positions = getPositions().values
-        if (positions.isEmpty()) return Bounds(0f, 0f, 0f, 0f)
+        val values = positions.values
+        if (values.isEmpty()) return Bounds(0f, 0f, 0f, 0f)
         var minX = Float.MAX_VALUE
         var minY = Float.MAX_VALUE
-        var maxX = -Float.MAX_VALUE
-        var maxY = -Float.MAX_VALUE
-        for (p in positions) {
+        var maxX = Float.MIN_VALUE
+        var maxY = Float.MIN_VALUE
+        for (p in values) {
             if (p.x < minX) minX = p.x
             if (p.y < minY) minY = p.y
             if (p.x > maxX) maxX = p.x
@@ -44,10 +47,12 @@ public abstract class TreeLayoutResult<T> {
     }
 
     /** Returns a new result with all positions shifted by [dx] and [dy]. */
-    public fun translated(dx: Float, dy: Float): TreeLayoutResult<T> {
-        val mapped = getPositions().mapValues { (_, p) -> Point(p.x + dx, p.y + dy) }
-        return MapTreeLayoutResult(mapped, getMaxDepth())
-    }
+    public fun translated(dx: Float, dy: Float): TreeLayoutResult<T> =
+        TreeLayoutResult(positions.mapValues { (_, p) -> Point(p.x + dx, p.y + dy) }, maxDepth)
+
+    /** Returns a new result with all positions transformed by [transform]. */
+    public fun mapped(transform: (Point) -> Point): TreeLayoutResult<T> =
+        TreeLayoutResult(positions.mapValues { (_, p) -> transform(p) }, maxDepth)
 
     /**
      * Returns a new result uniformly scaled to fit within [width]×[height],
@@ -63,9 +68,11 @@ public abstract class TreeLayoutResult<T> {
             bh == 0f -> width / bw
             else -> min(width / bw, height / bh)
         }
-        val mapped = getPositions().mapValues { (_, p) ->
-            Point((p.x - bounds.minX) * scale, (p.y - bounds.minY) * scale)
-        }
-        return MapTreeLayoutResult(mapped, getMaxDepth())
+        return TreeLayoutResult(
+            positions.mapValues { (_, p) ->
+                Point((p.x - bounds.minX) * scale, (p.y - bounds.minY) * scale)
+            },
+            maxDepth,
+        )
     }
 }
