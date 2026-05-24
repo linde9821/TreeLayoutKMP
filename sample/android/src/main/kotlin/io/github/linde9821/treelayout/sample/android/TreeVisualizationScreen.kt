@@ -1,5 +1,9 @@
 package io.github.linde9821.treelayout.sample.android
 
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,6 +62,11 @@ import kotlin.math.PI
 import kotlin.math.roundToInt
 
 private const val DEFAULT_INPUT: String = "Not all those who wander are lost"
+
+private val PointToVector = TwoWayConverter<Point, AnimationVector2D>(
+    convertToVector = { AnimationVector2D(it.x, it.y) },
+    convertFromVector = { Point(it.v1, it.v2) },
+)
 
 private enum class LayoutType { Walker, RadialWalker, DirectAngular }
 
@@ -119,10 +128,12 @@ internal fun TreeVisualizationScreen() {
     var orientationExpanded by remember { mutableStateOf(false) }
     var layoutTypeExpanded by remember { mutableStateOf(false) }
 
-    val words = input.lowercase().split("\\s+".toRegex())
-        .map { it.filter(Char::isLetter) }
-        .filter { it.isNotEmpty() }
-    val tree = buildPrefixTree(words)
+    val words = remember(input) {
+        input.lowercase().split("\\s+".toRegex())
+            .map { it.filter(Char::isLetter) }
+            .filter { it.isNotEmpty() }
+    }
+    val tree = remember(words) { buildPrefixTree(words) }
 
     val parentMap = buildMap<PrefixNode, PrefixNode?> {
         fun walk(node: PrefixNode, parent: PrefixNode?) {
@@ -158,29 +169,49 @@ internal fun TreeVisualizationScreen() {
             (textLayouts[node]?.size?.height?.toFloat() ?: 0f) + nodePaddingV * 2
     }
 
-    val positions: Map<PrefixNode, Point> = when (layoutType) {
-        LayoutType.Walker -> {
-            val config = WalkerLayoutConfiguration(
-                horizontalDistance = horizontalDistance,
-                verticalDistance = verticalDistance,
-                orientation = orientation,
-            )
-            WalkerTreeLayout(adapter, config, extents).layout().getPositions()
+    val targetResult = remember(
+        layoutType, horizontalDistance, verticalDistance, orientation,
+        layerDistance, margin, rotation, tree, nodePaddingH, nodePaddingV,
+    ) {
+        when (layoutType) {
+            LayoutType.Walker -> {
+                val config = WalkerLayoutConfiguration(
+                    horizontalDistance = horizontalDistance,
+                    verticalDistance = verticalDistance,
+                    orientation = orientation,
+                )
+                WalkerTreeLayout(adapter, config, extents).layout()
+            }
+            LayoutType.RadialWalker -> {
+                val config = RadialWalkerLayoutConfiguration(
+                    layerDistance = layerDistance,
+                    margin = margin,
+                    rotation = rotation,
+                )
+                RadialWalkerTreeLayout(adapter, config, extents).layout()
+            }
+            LayoutType.DirectAngular -> {
+                val config = DirectAngularPlacementConfiguration(
+                    layerDistance = layerDistance,
+                    rotation = rotation,
+                )
+                DirectAngularPlacementLayout(adapter, config).layout()
+            }
         }
-        LayoutType.RadialWalker -> {
-            val config = RadialWalkerLayoutConfiguration(
-                layerDistance = layerDistance,
-                margin = margin,
-                rotation = rotation,
+    }
+
+    val targetPositions = targetResult.getPositions()
+
+    // Animate each node position
+    val positions: Map<PrefixNode, Point> = buildMap {
+        for ((node, target) in targetPositions) {
+            val animated by animateValueAsState(
+                targetValue = target,
+                typeConverter = PointToVector,
+                animationSpec = tween(durationMillis = 300),
+                label = "node-pos",
             )
-            RadialWalkerTreeLayout(adapter, config, extents).layout().getPositions()
-        }
-        LayoutType.DirectAngular -> {
-            val config = DirectAngularPlacementConfiguration(
-                layerDistance = layerDistance,
-                rotation = rotation,
-            )
-            DirectAngularPlacementLayout(adapter, config).layout().getPositions()
+            put(node, animated)
         }
     }
 

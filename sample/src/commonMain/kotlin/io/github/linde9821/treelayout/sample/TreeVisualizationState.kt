@@ -1,5 +1,9 @@
 package io.github.linde9821.treelayout.sample
 
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +52,11 @@ public class TreeVisualizationState(
     public val textLayouts: Map<PrefixNode, TextLayoutResult>,
 )
 
+private val PointToVector = TwoWayConverter<Point, AnimationVector2D>(
+    convertToVector = { AnimationVector2D(it.x, it.y) },
+    convertFromVector = { Point(it.v1, it.v2) },
+)
+
 @Composable
 public fun rememberTreeVisualizationState(): TreeVisualizationState {
     var input by remember { mutableStateOf(DEFAULT_INPUT) }
@@ -61,11 +70,13 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
     var margin by remember { mutableStateOf(0.5f) }
     var rotation by remember { mutableStateOf(0f) }
 
-    val words = input.lowercase().split("\\s+".toRegex())
-        .map { it.filter(Char::isLetter) }
-        .filter { it.isNotEmpty() }
-    val tree = buildPrefixTree(words)
-    val adapter = prefixTreeAdapter(tree)
+    val words = remember(input) {
+        input.lowercase().split("\\s+".toRegex())
+            .map { it.filter(Char::isLetter) }
+            .filter { it.isNotEmpty() }
+    }
+    val tree = remember(words) { buildPrefixTree(words) }
+    val adapter = remember(tree) { prefixTreeAdapter(tree) }
 
     val textMeasurer = rememberTextMeasurer()
     val textStyle = TextStyle(fontSize = 14.sp, color = Color.Black)
@@ -89,7 +100,7 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
             (textLayouts[node]?.size?.height?.toFloat() ?: 0f) + nodePaddingV * 2
     }
 
-    val positions = when (layoutType) {
+    val targetPositions: Map<PrefixNode, Point> = when (layoutType) {
         LayoutType.Walker -> {
             val config = WalkerLayoutConfiguration(
                 horizontalDistance = horizontalDistance,
@@ -115,6 +126,9 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
         }
     }
 
+    // Animate each node position individually using Compose's animation system.
+    val positions = animatePositions(targetPositions)
+
     return TreeVisualizationState(
         input = input,
         onInputChange = { input = it },
@@ -139,4 +153,22 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
         positions = positions,
         textLayouts = textLayouts,
     )
+}
+
+@Composable
+private fun animatePositions(targets: Map<PrefixNode, Point>): Map<PrefixNode, Point> {
+    // We need a stable list of nodes to call animateValueAsState for each.
+    // Since tree is remembered, the node set is stable across parameter changes.
+    val entries = targets.entries.toList()
+    val result = HashMap<PrefixNode, Point>(entries.size)
+    for ((node, target) in entries) {
+        val animated by animateValueAsState(
+            targetValue = target,
+            typeConverter = PointToVector,
+            animationSpec = tween(durationMillis = 300),
+            label = "node-pos",
+        )
+        result[node] = animated
+    }
+    return result
 }
