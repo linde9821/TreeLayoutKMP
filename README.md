@@ -33,7 +33,7 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.4.0")
+    implementation("io.github.linde9821:treelayout-kmp:0.5.0")
 }
 ```
 
@@ -117,6 +117,57 @@ println("Tree depth: ${result.getMaxDepth()}")
 
 Coordinates use a top-down orientation: the root is at `y = 0`, and depth increases downward by `verticalDistance` per
 level.
+
+### Transformations
+
+`TreeLayoutResult<T>` provides chainable methods for adapting coordinates to your rendering target:
+
+```kotlin
+// Scale and center within a viewport
+val fitted = result.centered(canvasWidth, canvasHeight)
+
+// Flip Y for a canvas where Y grows downward
+val flipped = result.scaledTo(800f, 600f).mapped { Point(it.x, 600f - it.y) }
+
+// Arbitrary transform — rotation, padding, coordinate remapping
+val padded = result.normalized().mapped { Point(it.x + 20f, it.y + 20f) }
+```
+
+All transformation methods return a new `TreeLayoutResult<T>` — the original is never mutated.
+
+### Animated Transitions
+
+`LayoutTransition<T>` enables smooth animations between two layout states (e.g., when the tree structure changes):
+
+```kotlin
+import io.github.linde9821.treelayout.result.LayoutTransition
+
+val transition = LayoutTransition(oldResult, newResult)
+
+// Query which nodes are entering/exiting
+transition.enteringNodes  // nodes added in newResult
+transition.exitingNodes   // nodes removed from oldResult
+
+// In your animation loop (framework-agnostic):
+val frame = transition.interpolate(progress) // 0.0 → oldResult, 1.0 → newResult
+```
+
+In Jetpack Compose, drive `progress` with `Animatable` or `animateFloatAsState` and call `interpolate` each frame.
+
+### Serialization
+
+Zero-dependency JSON serialization for caching or transmitting layouts:
+
+```kotlin
+import io.github.linde9821.treelayout.result.toJson
+import io.github.linde9821.treelayout.result.fromJson
+
+// Serialize
+val json = result.toJson { node -> node.id }
+
+// Deserialize
+val restored = TreeLayoutResult.fromJson(json) { id -> findNodeById(id) }
+```
 
 ### 4. Variable Node Sizes
 
@@ -315,11 +366,42 @@ Constructor parameters: `adapter: TreeAdapter<T>`, `configuration: DirectAngular
 
 ### `TreeLayoutResult<T>`
 
-| Method                          | Description                                     |
-|---------------------------------|-------------------------------------------------|
-| `getPosition(node: T): Point`   | Returns the `(x, y)` coordinate for a node.     |
-| `getPositions(): Map<T, Point>` | Returns all node-to-coordinate mappings.        |
-| `getMaxDepth(): Int`            | Returns the maximum depth of the laid-out tree. |
+A concrete class representing the output of any layout algorithm. Can also be constructed directly for testing or custom
+layout engines: `TreeLayoutResult(positions: Map<T, Point>, maxDepth: Int)`.
+
+| Method                                                | Description                                                                 |
+|-------------------------------------------------------|-----------------------------------------------------------------------------|
+| `getPosition(node: T): Point`                         | Returns the `(x, y)` coordinate for a node.                                |
+| `getPositions(): Map<T, Point>`                       | Returns all node-to-coordinate mappings.                                    |
+| `getMaxDepth(): Int`                                  | Returns the maximum depth of the laid-out tree.                             |
+| `getBounds(): Bounds`                                 | Returns the axis-aligned bounding box of all positions.                     |
+| `normalized(): TreeLayoutResult<T>`                   | Shifts positions so the minimum corner is at the origin.                    |
+| `translated(dx: Float, dy: Float): TreeLayoutResult<T>` | Shifts all positions by the given offset.                                |
+| `scaledTo(width: Float, height: Float): TreeLayoutResult<T>` | Scales to fit within the given dimensions (preserves aspect ratio). |
+| `centered(width: Float, height: Float): TreeLayoutResult<T>` | Scales to fit and centers within a viewport.                        |
+| `mapped(transform: (Point) -> Point): TreeLayoutResult<T>`   | Applies an arbitrary transform to all positions.                    |
+
+### `LayoutTransition<T>`
+
+Enables animated transitions between two layout states.
+
+| Member                                        | Description                                                        |
+|-----------------------------------------------|--------------------------------------------------------------------|
+| `LayoutTransition(from, to)`                  | Constructor taking the start and end `TreeLayoutResult`.           |
+| `allNodes: Set<T>`                            | All nodes in either state.                                         |
+| `persistentNodes: Set<T>`                     | Nodes present in both states.                                      |
+| `enteringNodes: Set<T>`                       | Nodes only in the end state.                                       |
+| `exitingNodes: Set<T>`                        | Nodes only in the start state.                                     |
+| `interpolate(progress: Float): TreeLayoutResult<T>` | Returns positions interpolated between start and end (0.0–1.0). |
+
+### Serialization Extensions
+
+Extension functions in `io.github.linde9821.treelayout.result`:
+
+| Function                                                                          | Description                                    |
+|-----------------------------------------------------------------------------------|------------------------------------------------|
+| `TreeLayoutResult<T>.toJson(nodeToKey: (T) -> String): String`                    | Serializes the layout to a JSON string.        |
+| `TreeLayoutResult.Companion.fromJson(json: String, keyToNode: (String) -> T): TreeLayoutResult<T>` | Deserializes a layout from JSON. |
 
 ### `Point`
 

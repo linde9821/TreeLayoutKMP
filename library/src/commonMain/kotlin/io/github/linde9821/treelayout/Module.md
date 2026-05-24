@@ -1,6 +1,8 @@
 # Module TreeLayoutKMP
 
 A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/Buchheim algorithm in O(n) time.
+Includes transformation utilities for adapting coordinates to any rendering target, animation support for smooth
+transitions between layout states, and zero-dependency JSON serialization for caching or transmitting results.
 
 ## Getting Started
 
@@ -39,4 +41,8 @@ Direct angular partitioning layout for radial trees.
 
 # Package io.github.linde9821.treelayout.result
 
-Layout result types and bounding box utilities.
+Layout result types, transformation utilities, and bounding box helpers.
+[TreeLayoutResult][io.github.linde9821.treelayout.result.TreeLayoutResult] is a concrete class providing chainable
+coordinate transforms (`mapped`, `centered`, `scaledTo`, `normalized`, `translated`).
+[LayoutTransition][io.github.linde9821.treelayout.result.LayoutTransition] enables animated interpolation between
+two layout states. Extension functions `toJson` and `fromJson` provide zero-dependency JSON serialization.
