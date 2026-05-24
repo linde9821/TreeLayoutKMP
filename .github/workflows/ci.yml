@@ -27,15 +27,17 @@ jobs:
         run: ./gradlew :library:check
 
       - name: Generate coverage report
-        run: ./gradlew :library:koverXmlReportJvm
+        run: ./gradlew :library:jvmTest :library:jacocoTestReport
 
       - name: Parse coverage percentage
         id: coverage
         run: |
-          REPORT="library/build/reports/kover/reportJvm.xml"
+          REPORT="library/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
           if [ -f "$REPORT" ]; then
-            LINE_COVERED=$(grep -o 'type="LINE"[^/]*covered="[0-9]*"' "$REPORT" | head -1 | grep -o 'covered="[0-9]*"' | grep -o '[0-9]*')
-            LINE_MISSED=$(grep -o 'type="LINE"[^/]*missed="[0-9]*"' "$REPORT" | head -1 | grep -o 'missed="[0-9]*"' | grep -o '[0-9]*')
+            # JaCoCo: <counter type="LINE" missed="X" covered="Y"/> (last occurrence = project total)
+            LINE=$(grep 'type="LINE"' "$REPORT" | tail -1)
+            LINE_MISSED=$(echo "$LINE" | sed 's/.*missed="\([0-9]*\)".*/\1/')
+            LINE_COVERED=$(echo "$LINE" | sed 's/.*covered="\([0-9]*\)".*/\1/')
             TOTAL=$((LINE_COVERED + LINE_MISSED))
             if [ "$TOTAL" -gt 0 ]; then
               PERCENT=$((LINE_COVERED * 100 / TOTAL))

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.kover)
+    jacoco
 }
 
 group = "io.github.linde9821"
@@ -126,10 +126,23 @@ mavenPublishing {
     }
 }
 
-kover {
-    currentProject {
-        createVariant("jvm") {
-            add("jvm")
-        }
+tasks.named<Test>("jvmTest") {
+    finalizedBy(tasks.named("jacocoTestReport"))
+}
+
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("jvmTest"))
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
     }
+    classDirectories.setFrom(
+        fileTree("build/classes/kotlin/jvm/main")
+    )
+    sourceDirectories.setFrom(
+        files("src/commonMain/kotlin")
+    )
+    executionData.setFrom(
+        fileTree("build") { include("jacoco/jvmTest.exec") }
+    )
 }
