@@ -4,7 +4,7 @@ A Kotlin Multiplatform library for computing tidy tree layouts using the Walker/
 
 ## Getting Started
 
-Create a [TreeAdapter] for your tree structure, then pass it to [WalkerTreeLayout][io.github.linde9821.treelayout.walker.WalkerTreeLayout]:
+Create a [TreeAdapter][io.github.linde9821.treelayout.TreeAdapter] for your tree structure, then pass it to [WalkerTreeLayout][io.github.linde9821.treelayout.walker.WalkerTreeLayout]:
 
 ```kotlin
 val layout = WalkerTreeLayout(adapter, WalkerLayoutConfiguration(horizontalDistance = 2f))
