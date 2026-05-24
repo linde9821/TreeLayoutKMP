@@ -12,6 +12,9 @@ plugins {
 group = "io.github.linde9821"
 version = "0.4.0"
 
+dokka {
+    moduleName.set("TreeLayoutKMP")
+}
 kotlin {
     explicitApi()
     jvmToolchain(17)
