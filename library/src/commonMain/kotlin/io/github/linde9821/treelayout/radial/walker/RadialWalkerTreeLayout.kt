@@ -70,7 +70,7 @@ public class RadialWalkerTreeLayout<T>(
             )
         }
 
-        return RadialLayoutResult(radialPositions, linearResult.getMaxDepth())
+        return TreeLayoutResult(radialPositions, linearResult.getMaxDepth())
     }
 
     private fun computeDepths(node: T, depth: Int, depthOf: HashMap<T, Int>) {
@@ -84,16 +84,4 @@ public class RadialWalkerTreeLayout<T>(
 private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
     override fun width(node: T): Float = 0.0f
     override fun height(node: T): Float = 0.0f
-}
-
-private class RadialLayoutResult<T>(
-    private val positions: Map<T, Point>,
-    private val maxDepth: Int,
-) : TreeLayoutResult<T>() {
-    override fun getPosition(node: T): Point =
-        positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
-
-    override fun getPositions(): Map<T, Point> = positions
-
-    override fun getMaxDepth(): Int = maxDepth
 }

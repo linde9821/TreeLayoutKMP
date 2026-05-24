@@ -25,3 +25,39 @@ jobs:
 
       - name: Build and test
         run: ./gradlew :library:check
+
+      - name: Generate coverage report
+        run: ./gradlew :library:jvmTest :library:jacocoCoverageReport
+
+      - name: Parse coverage percentage
+        id: coverage
+        run: |
+          REPORT="library/build/reports/jacoco/jacocoCoverageReport/jacocoCoverageReport.xml"
+          if [ -f "$REPORT" ]; then
+            # JaCoCo: <counter type="LINE" missed="X" covered="Y"/> (last occurrence = project total)
+            LINE=$(grep 'type="LINE"' "$REPORT" | tail -1)
+            LINE_MISSED=$(echo "$LINE" | sed 's/.*missed="\([0-9]*\)".*/\1/')
+            LINE_COVERED=$(echo "$LINE" | sed 's/.*covered="\([0-9]*\)".*/\1/')
+            TOTAL=$((LINE_COVERED + LINE_MISSED))
+            if [ "$TOTAL" -gt 0 ]; then
+              PERCENT=$((LINE_COVERED * 100 / TOTAL))
+            else
+              PERCENT=0
+            fi
+          else
+            PERCENT=0
+          fi
+          echo "percentage=$PERCENT" >> "$GITHUB_OUTPUT"
+
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ vars.COVERAGE_GIST_ID }}
+          filename: coverage.json
+          label: coverage
+          message: ${{ steps.coverage.outputs.percentage }}%
+          valColorRange: ${{ steps.coverage.outputs.percentage }}
+          minColorRange: 50
+          maxColorRange: 90

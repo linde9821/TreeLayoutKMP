@@ -75,7 +75,7 @@ private class LayoutContext<T>(
     }
 
     fun buildResult(): TreeLayoutResult<T> {
-        return LayoutResultImpl(positions.toMap(), maxDepth)
+        return TreeLayoutResult(positions.toMap(), maxDepth)
     }
 
     private fun initNodes(node: T, depth: Int) {
@@ -248,16 +248,4 @@ private class LayoutContext<T>(
     }
 
     private fun numberOf(v: T): Int = (indexAmongSiblings[v] ?: 0) + 1
-}
-
-private class LayoutResultImpl<T>(
-    private val positions: Map<T, Point>,
-    private val maxDepth: Int,
-) : TreeLayoutResult<T>() {
-    override fun getPosition(node: T): Point =
-        positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
-
-    override fun getPositions(): Map<T, Point> = positions
-
-    override fun getMaxDepth(): Int = maxDepth
 }

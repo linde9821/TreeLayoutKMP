@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class TreeLayoutResultTest {
 
     private fun result(vararg entries: Pair<String, Point>): TreeLayoutResult<String> =
-        MapTreeLayoutResult(entries.toMap(), maxDepth = 1)
+        TreeLayoutResult(entries.toMap(), maxDepth = 1)
 
     @Test
     fun getBoundsReturnsCorrectBoundingBox() {
@@ -88,10 +88,41 @@ class TreeLayoutResultTest {
     }
 
     @Test
+    fun mappedAppliesTransformToAllPositions() {
+        val r = result("a" to Point(1f, 2f), "b" to Point(3f, 4f))
+        val m = r.mapped { Point(it.x * 2f, it.y + 10f) }
+        assertEquals(Point(2f, 12f), m.getPosition("a"))
+        assertEquals(Point(6f, 14f), m.getPosition("b"))
+    }
+
+    @Test
+    fun mappedPreservesMaxDepth() {
+        val r = TreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 7)
+        assertEquals(7, r.mapped { it }.getMaxDepth())
+    }
+
+    @Test
     fun maxDepthIsPreservedThroughTransformations() {
-        val r = MapTreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 5)
+        val r = TreeLayoutResult(mapOf("a" to Point(0f, 0f)), maxDepth = 5)
         assertEquals(5, r.normalized().getMaxDepth())
         assertEquals(5, r.translated(1f, 1f).getMaxDepth())
         assertEquals(5, r.scaledTo(100f, 100f).getMaxDepth())
+    }
+
+    @Test
+    fun centeredPlacesLayoutInMiddleOfViewport() {
+        // Layout spans 0..10 x 0..20 → scaledTo 100x100 → factor=5 → becomes 50x100
+        // Centered in 100x100: dx = (100-50)/2 = 25, dy = (100-100)/2 = 0
+        val r = result("a" to Point(0f, 0f), "b" to Point(10f, 20f))
+        val c = r.centered(100f, 100f)
+        assertEquals(Point(25f, 0f), c.getPosition("a"))
+        assertEquals(Point(75f, 100f), c.getPosition("b"))
+    }
+
+    @Test
+    fun centeredSingleNodePlacesAtCenter() {
+        val r = result("a" to Point(5f, 5f))
+        val c = r.centered(200f, 100f)
+        assertEquals(Point(100f, 50f), c.getPosition("a"))
     }
 }

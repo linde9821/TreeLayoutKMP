@@ -7,10 +7,11 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.dokka)
+    jacoco
 }
 
 group = "io.github.linde9821"
-version = "0.4.0"
+version = "0.5.0"
 
 dokka {
     moduleName.set("TreeLayoutKMP")
@@ -123,4 +124,25 @@ mavenPublishing {
             developerConnection = "scm:git:ssh://git@github.com/linde9821/TreeLayoutKMP.git"
         }
     }
+}
+
+tasks.named("jvmTest") {
+    finalizedBy("jacocoCoverageReport")
+}
+
+tasks.register<JacocoReport>("jacocoCoverageReport") {
+    dependsOn("jvmTest")
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    classDirectories.setFrom(
+        fileTree("build/classes/kotlin/jvm/main")
+    )
+    sourceDirectories.setFrom(
+        files("src/commonMain/kotlin")
+    )
+    executionData.setFrom(
+        fileTree("build") { include("jacoco/jvmTest.exec") }
+    )
 }

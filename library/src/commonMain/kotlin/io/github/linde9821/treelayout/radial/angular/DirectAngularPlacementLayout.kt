@@ -60,7 +60,7 @@ public class DirectAngularPlacementLayout<T>(
         }
 
         assignAngles(adapter.root(), 0, 0f, 2f * PI.toFloat())
-        return DirectAngularResult(positions, maxDepth)
+        return TreeLayoutResult(positions, maxDepth)
     }
 
     private fun computeWeights(node: T, weight: HashMap<T, Int>): Int {
@@ -72,16 +72,4 @@ public class DirectAngularPlacementLayout<T>(
         weight[node] = w
         return w
     }
-}
-
-private class DirectAngularResult<T>(
-    private val positions: Map<T, Point>,
-    private val maxDepth: Int,
-) : TreeLayoutResult<T>() {
-    override fun getPosition(node: T): Point =
-        positions[node] ?: throw IllegalArgumentException("Node not part of the layout")
-
-    override fun getPositions(): Map<T, Point> = positions
-
-    override fun getMaxDepth(): Int = maxDepth
 }

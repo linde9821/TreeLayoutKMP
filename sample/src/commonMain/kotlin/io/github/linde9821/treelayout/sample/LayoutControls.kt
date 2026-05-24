@@ -57,6 +57,7 @@ public fun LayoutControls(
             LayoutType.Walker -> WalkerControls(state, compact, orientationExpanded) {
                 orientationExpanded = it
             }
+
             LayoutType.RadialWalker -> RadialWalkerControls(state, compact)
             LayoutType.DirectAngular -> DirectAngularControls(state, compact)
         }
@@ -84,7 +85,13 @@ private fun WalkerControls(
     SectionLabel("Spacing")
     if (compact) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LabeledSlider("H", state.horizontalDistance, state.onHorizontalDistanceChange, 0f..200f, Modifier.weight(1f))
+            LabeledSlider(
+                "H",
+                state.horizontalDistance,
+                state.onHorizontalDistanceChange,
+                0f..200f,
+                Modifier.weight(1f)
+            )
             LabeledSlider("V", state.verticalDistance, state.onVerticalDistanceChange, 0f..200f, Modifier.weight(1f))
         }
     } else {
@@ -112,7 +119,14 @@ private fun RadialWalkerControls(state: TreeVisualizationState, compact: Boolean
     if (compact) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             LabeledSlider("Layer", state.layerDistance, state.onLayerDistanceChange, 10f..200f, Modifier.weight(1f))
-            LabeledSlider("Margin", state.margin, state.onMarginChange, 0f..PI.toFloat(), Modifier.weight(1f), decimals = true)
+            LabeledSlider(
+                "Margin",
+                state.margin,
+                state.onMarginChange,
+                0f..PI.toFloat(),
+                Modifier.weight(1f),
+                decimals = true
+            )
         }
     } else {
         LabeledSlider("Layer Distance", state.layerDistance, state.onLayerDistanceChange, 10f..200f)
@@ -127,7 +141,14 @@ private fun DirectAngularControls(state: TreeVisualizationState, compact: Boolea
     if (compact) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             LabeledSlider("Layer", state.layerDistance, state.onLayerDistanceChange, 10f..200f, Modifier.weight(1f))
-            LabeledSlider("Rotation", state.rotation, state.onRotationChange, 0f..2f * PI.toFloat(), Modifier.weight(1f), decimals = true)
+            LabeledSlider(
+                "Rotation",
+                state.rotation,
+                state.onRotationChange,
+                0f..2f * PI.toFloat(),
+                Modifier.weight(1f),
+                decimals = true
+            )
         }
     } else {
         LabeledSlider("Layer Distance", state.layerDistance, state.onLayerDistanceChange, 10f..200f)

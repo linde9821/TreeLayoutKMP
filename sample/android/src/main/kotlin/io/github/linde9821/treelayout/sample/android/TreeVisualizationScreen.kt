@@ -1,5 +1,9 @@
 package io.github.linde9821.treelayout.sample.android
 
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,6 +62,11 @@ import kotlin.math.PI
 import kotlin.math.roundToInt
 
 private const val DEFAULT_INPUT: String = "Not all those who wander are lost"
+
+private val PointToVector = TwoWayConverter<Point, AnimationVector2D>(
+    convertToVector = { AnimationVector2D(it.x, it.y) },
+    convertFromVector = { Point(it.v1, it.v2) },
+)
 
 private enum class LayoutType { Walker, RadialWalker, DirectAngular }
 
@@ -119,10 +128,12 @@ internal fun TreeVisualizationScreen() {
     var orientationExpanded by remember { mutableStateOf(false) }
     var layoutTypeExpanded by remember { mutableStateOf(false) }
 
-    val words = input.lowercase().split("\\s+".toRegex())
-        .map { it.filter(Char::isLetter) }
-        .filter { it.isNotEmpty() }
-    val tree = buildPrefixTree(words)
+    val words = remember(input) {
+        input.lowercase().split("\\s+".toRegex())
+            .map { it.filter(Char::isLetter) }
+            .filter { it.isNotEmpty() }
+    }
+    val tree = remember(words) { buildPrefixTree(words) }
 
     val parentMap = buildMap<PrefixNode, PrefixNode?> {
         fun walk(node: PrefixNode, parent: PrefixNode?) {
@@ -158,29 +169,51 @@ internal fun TreeVisualizationScreen() {
             (textLayouts[node]?.size?.height?.toFloat() ?: 0f) + nodePaddingV * 2
     }
 
-    val positions: Map<PrefixNode, Point> = when (layoutType) {
-        LayoutType.Walker -> {
-            val config = WalkerLayoutConfiguration(
-                horizontalDistance = horizontalDistance,
-                verticalDistance = verticalDistance,
-                orientation = orientation,
-            )
-            WalkerTreeLayout(adapter, config, extents).layout().getPositions()
+    val targetResult = remember(
+        layoutType, horizontalDistance, verticalDistance, orientation,
+        layerDistance, margin, rotation, tree, nodePaddingH, nodePaddingV,
+    ) {
+        when (layoutType) {
+            LayoutType.Walker -> {
+                val config = WalkerLayoutConfiguration(
+                    horizontalDistance = horizontalDistance,
+                    verticalDistance = verticalDistance,
+                    orientation = orientation,
+                )
+                WalkerTreeLayout(adapter, config, extents).layout()
+            }
+
+            LayoutType.RadialWalker -> {
+                val config = RadialWalkerLayoutConfiguration(
+                    layerDistance = layerDistance,
+                    margin = margin,
+                    rotation = rotation,
+                )
+                RadialWalkerTreeLayout(adapter, config, extents).layout()
+            }
+
+            LayoutType.DirectAngular -> {
+                val config = DirectAngularPlacementConfiguration(
+                    layerDistance = layerDistance,
+                    rotation = rotation,
+                )
+                DirectAngularPlacementLayout(adapter, config).layout()
+            }
         }
-        LayoutType.RadialWalker -> {
-            val config = RadialWalkerLayoutConfiguration(
-                layerDistance = layerDistance,
-                margin = margin,
-                rotation = rotation,
+    }
+
+    val targetPositions = targetResult.getPositions()
+
+    // Animate each node position
+    val positions: Map<PrefixNode, Point> = buildMap {
+        for ((node, target) in targetPositions) {
+            val animated by animateValueAsState(
+                targetValue = target,
+                typeConverter = PointToVector,
+                animationSpec = tween(durationMillis = 300),
+                label = "node-pos",
             )
-            RadialWalkerTreeLayout(adapter, config, extents).layout().getPositions()
-        }
-        LayoutType.DirectAngular -> {
-            val config = DirectAngularPlacementConfiguration(
-                layerDistance = layerDistance,
-                rotation = rotation,
-            )
-            DirectAngularPlacementLayout(adapter, config).layout().getPositions()
+            put(node, animated)
         }
     }
 
@@ -220,27 +253,44 @@ internal fun TreeVisualizationScreen() {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("H Distance: ${horizontalDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = horizontalDistance, onValueChange = { horizontalDistance = it }, valueRange = 0f..200f)
+                            Slider(
+                                value = horizontalDistance,
+                                onValueChange = { horizontalDistance = it },
+                                valueRange = 0f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("V Distance: ${verticalDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = verticalDistance, onValueChange = { verticalDistance = it }, valueRange = 0f..200f)
+                            Slider(
+                                value = verticalDistance,
+                                onValueChange = { verticalDistance = it },
+                                valueRange = 0f..200f
+                            )
                         }
                     }
                     Box {
                         OutlinedButton(onClick = { orientationExpanded = true }) { Text(orientation.name) }
-                        DropdownMenu(expanded = orientationExpanded, onDismissRequest = { orientationExpanded = false }) {
+                        DropdownMenu(
+                            expanded = orientationExpanded,
+                            onDismissRequest = { orientationExpanded = false }) {
                             Orientation.entries.forEach { o ->
-                                DropdownMenuItem(onClick = { orientation = o; orientationExpanded = false }) { Text(o.name) }
+                                DropdownMenuItem(onClick = {
+                                    orientation = o; orientationExpanded = false
+                                }) { Text(o.name) }
                             }
                         }
                     }
                 }
+
                 LayoutType.RadialWalker -> {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Layer: ${layerDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = layerDistance, onValueChange = { layerDistance = it }, valueRange = 10f..200f)
+                            Slider(
+                                value = layerDistance,
+                                onValueChange = { layerDistance = it },
+                                valueRange = 10f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Margin: ${(margin * 100).roundToInt() / 100f}", fontSize = 12.sp)
@@ -252,15 +302,24 @@ internal fun TreeVisualizationScreen() {
                         Slider(value = rotation, onValueChange = { rotation = it }, valueRange = 0f..2f * PI.toFloat())
                     }
                 }
+
                 LayoutType.DirectAngular -> {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Layer: ${layerDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = layerDistance, onValueChange = { layerDistance = it }, valueRange = 10f..200f)
+                            Slider(
+                                value = layerDistance,
+                                onValueChange = { layerDistance = it },
+                                valueRange = 10f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Rotation: ${(rotation * 100).roundToInt() / 100f}", fontSize = 12.sp)
-                            Slider(value = rotation, onValueChange = { rotation = it }, valueRange = 0f..2f * PI.toFloat())
+                            Slider(
+                                value = rotation,
+                                onValueChange = { rotation = it },
+                                valueRange = 0f..2f * PI.toFloat()
+                            )
                         }
                     }
                 }
