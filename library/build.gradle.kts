@@ -126,12 +126,12 @@ mavenPublishing {
     }
 }
 
-tasks.named<Test>("jvmTest") {
-    finalizedBy(tasks.named("jacocoTestReport"))
+tasks.named("jvmTest") {
+    finalizedBy("jacocoCoverageReport")
 }
 
-tasks.named<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.named("jvmTest"))
+tasks.register<JacocoReport>("jacocoCoverageReport") {
+    dependsOn("jvmTest")
     reports {
         xml.required.set(true)
         html.required.set(true)

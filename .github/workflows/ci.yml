@@ -27,12 +27,12 @@ jobs:
         run: ./gradlew :library:check
 
       - name: Generate coverage report
-        run: ./gradlew :library:jvmTest :library:jacocoTestReport
+        run: ./gradlew :library:jvmTest :library:jacocoCoverageReport
 
       - name: Parse coverage percentage
         id: coverage
         run: |
-          REPORT="library/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+          REPORT="library/build/reports/jacoco/jacocoCoverageReport/jacocoCoverageReport.xml"
           if [ -f "$REPORT" ]; then
             # JaCoCo: <counter type="LINE" missed="X" covered="Y"/> (last occurrence = project total)
             LINE=$(grep 'type="LINE"' "$REPORT" | tail -1)
