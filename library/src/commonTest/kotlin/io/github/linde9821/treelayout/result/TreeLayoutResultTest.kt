@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class TreeLayoutResultTest {
 
     private fun result(vararg entries: Pair<String, Point>): TreeLayoutResult<String> =
-        MapTreeLayoutResult(entries.toMap(), maxDepth = 1)
+        TreeLayoutResult(entries.toMap(), maxDepth = 1)
 
     @Test
     fun getBoundsReturnsCorrectBoundingBox() {
