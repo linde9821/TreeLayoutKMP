@@ -43,12 +43,12 @@ class SerializationTest {
 
     @Test
     fun toJsonProducesValidFormat() {
-        val result = TreeLayoutResult(mapOf("x" to Point(1f, 2f)), maxDepth = 1)
+        val result = TreeLayoutResult(mapOf("x" to Point(1.5f, 2.5f)), maxDepth = 1)
         val json = result.toJson { it }
         assertTrue(json.contains("\"maxDepth\":1"))
         assertTrue(json.contains("\"k\":\"x\""))
-        assertTrue(json.contains("\"px\":1.0"))
-        assertTrue(json.contains("\"py\":2.0"))
+        assertTrue(json.contains("\"px\":1.5"))
+        assertTrue(json.contains("\"py\":2.5"))
     }
 
     @Test
