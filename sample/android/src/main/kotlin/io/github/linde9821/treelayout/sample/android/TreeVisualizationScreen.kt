@@ -182,6 +182,7 @@ internal fun TreeVisualizationScreen() {
                 )
                 WalkerTreeLayout(adapter, config, extents).layout()
             }
+
             LayoutType.RadialWalker -> {
                 val config = RadialWalkerLayoutConfiguration(
                     layerDistance = layerDistance,
@@ -190,6 +191,7 @@ internal fun TreeVisualizationScreen() {
                 )
                 RadialWalkerTreeLayout(adapter, config, extents).layout()
             }
+
             LayoutType.DirectAngular -> {
                 val config = DirectAngularPlacementConfiguration(
                     layerDistance = layerDistance,
@@ -251,27 +253,44 @@ internal fun TreeVisualizationScreen() {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("H Distance: ${horizontalDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = horizontalDistance, onValueChange = { horizontalDistance = it }, valueRange = 0f..200f)
+                            Slider(
+                                value = horizontalDistance,
+                                onValueChange = { horizontalDistance = it },
+                                valueRange = 0f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("V Distance: ${verticalDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = verticalDistance, onValueChange = { verticalDistance = it }, valueRange = 0f..200f)
+                            Slider(
+                                value = verticalDistance,
+                                onValueChange = { verticalDistance = it },
+                                valueRange = 0f..200f
+                            )
                         }
                     }
                     Box {
                         OutlinedButton(onClick = { orientationExpanded = true }) { Text(orientation.name) }
-                        DropdownMenu(expanded = orientationExpanded, onDismissRequest = { orientationExpanded = false }) {
+                        DropdownMenu(
+                            expanded = orientationExpanded,
+                            onDismissRequest = { orientationExpanded = false }) {
                             Orientation.entries.forEach { o ->
-                                DropdownMenuItem(onClick = { orientation = o; orientationExpanded = false }) { Text(o.name) }
+                                DropdownMenuItem(onClick = {
+                                    orientation = o; orientationExpanded = false
+                                }) { Text(o.name) }
                             }
                         }
                     }
                 }
+
                 LayoutType.RadialWalker -> {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Layer: ${layerDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = layerDistance, onValueChange = { layerDistance = it }, valueRange = 10f..200f)
+                            Slider(
+                                value = layerDistance,
+                                onValueChange = { layerDistance = it },
+                                valueRange = 10f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Margin: ${(margin * 100).roundToInt() / 100f}", fontSize = 12.sp)
@@ -283,15 +302,24 @@ internal fun TreeVisualizationScreen() {
                         Slider(value = rotation, onValueChange = { rotation = it }, valueRange = 0f..2f * PI.toFloat())
                     }
                 }
+
                 LayoutType.DirectAngular -> {
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Layer: ${layerDistance.toInt()}", fontSize = 12.sp)
-                            Slider(value = layerDistance, onValueChange = { layerDistance = it }, valueRange = 10f..200f)
+                            Slider(
+                                value = layerDistance,
+                                onValueChange = { layerDistance = it },
+                                valueRange = 10f..200f
+                            )
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Rotation: ${(rotation * 100).roundToInt() / 100f}", fontSize = 12.sp)
-                            Slider(value = rotation, onValueChange = { rotation = it }, valueRange = 0f..2f * PI.toFloat())
+                            Slider(
+                                value = rotation,
+                                onValueChange = { rotation = it },
+                                valueRange = 0f..2f * PI.toFloat()
+                            )
                         }
                     }
                 }

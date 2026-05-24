@@ -3,7 +3,6 @@ package io.github.linde9821.treelayout.result
 import io.github.linde9821.treelayout.Point
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class LayoutTransitionTest {
 

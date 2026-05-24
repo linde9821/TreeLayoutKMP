@@ -109,6 +109,7 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
             )
             WalkerTreeLayout(adapter, config, extents).layout().getPositions()
         }
+
         LayoutType.RadialWalker -> {
             val config = RadialWalkerLayoutConfiguration(
                 layerDistance = layerDistance,
@@ -117,6 +118,7 @@ public fun rememberTreeVisualizationState(): TreeVisualizationState {
             )
             RadialWalkerTreeLayout(adapter, config, extents).layout().getPositions()
         }
+
         LayoutType.DirectAngular -> {
             val config = DirectAngularPlacementConfiguration(
                 layerDistance = layerDistance,

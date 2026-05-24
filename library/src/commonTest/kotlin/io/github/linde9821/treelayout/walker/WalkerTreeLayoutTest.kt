@@ -217,6 +217,7 @@ class WalkerTreeLayoutTest {
             override fun root(): String = tree.root
             override fun children(node: String): List<String> =
                 tree.childrenMap[node]?.toList() ?: emptyList() // new list each call
+
             override fun parent(node: String): String? = tree.parentMap[node]
         }
 

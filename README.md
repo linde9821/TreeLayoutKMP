@@ -4,7 +4,8 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/linde9821/COVERAGE_GIST_ID/raw/coverage.json)](https://github.com/linde9821/TreeLayoutKMP/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.linde9821/treelayout-kmp)](https://central.sonatype.com/artifact/io.github.linde9821/treelayout-kmp)
 
-**[Live Demo](https://linde9821.github.io/TreeLayoutKMP/)** · **[API Docs](https://linde9821.github.io/TreeLayoutKMP/api/)**
+**[Live Demo](https://linde9821.github.io/TreeLayoutKMP/)** · *
+*[API Docs](https://linde9821.github.io/TreeLayoutKMP/api/)**
 
 > ⚠️ **This library is under active development and has not reached a stable release yet.**
 > The API may change between versions. Feedback and contributions are welcome.
@@ -207,7 +208,8 @@ val result = RadialWalkerTreeLayout(
 
 **Package:** `io.github.linde9821.treelayout.radial.angular`
 
-This algorithm recursively partitions angular space among children proportional to their **subtree weight** (total number
+This algorithm recursively partitions angular space among children proportional to their **subtree weight** (total
+number
 of descendants including the child itself). It runs in **O(n)** — one pass to compute weights, one pass to assign
 positions. This produces evenly distributed layouts where larger subtrees receive proportionally more angular space.
 
@@ -281,11 +283,11 @@ Constructor accepts an optional `nodeExtentProvider` parameter. When omitted, no
 
 ### `RadialWalkerLayoutConfiguration`
 
-| Property        | Type    | Default | Description                                                    |
-|-----------------|---------|---------|----------------------------------------------------------------|
-| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.                |
-| `margin`        | `Float` | `0.0f`  | Angular margin (in radians) subtracted from the full circle.   |
-| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions.     |
+| Property        | Type    | Default | Description                                                  |
+|-----------------|---------|---------|--------------------------------------------------------------|
+| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.              |
+| `margin`        | `Float` | `0.0f`  | Angular margin (in radians) subtracted from the full circle. |
+| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions.   |
 
 ### `RadialWalkerTreeLayout<T>`
 
@@ -299,9 +301,9 @@ Constructor parameters: `adapter: TreeAdapter<T>`, `configuration: RadialWalkerL
 ### `DirectAngularPlacementConfiguration`
 
 | Property        | Type    | Default | Description                                                |
-|-----------------|---------|---------|-------------------------------------------------------------|
-| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.             |
-| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions.  |
+|-----------------|---------|---------|------------------------------------------------------------|
+| `layerDistance` | `Float` | `1.0f`  | Radial distance between concentric depth rings.            |
+| `rotation`      | `Float` | `0.0f`  | Angular offset (in radians) applied to all node positions. |
 
 ### `DirectAngularPlacementLayout<T>`
 
