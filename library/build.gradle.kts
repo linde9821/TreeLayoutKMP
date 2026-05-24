@@ -125,3 +125,11 @@ mavenPublishing {
         }
     }
 }
+
+kover {
+    currentProject {
+        createVariant("jvm") {
+            add("jvm")
+        }
+    }
+}
