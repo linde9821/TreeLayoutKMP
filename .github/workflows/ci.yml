@@ -25,3 +25,37 @@ jobs:
 
       - name: Build and test
         run: ./gradlew :library:check
+
+      - name: Generate coverage report
+        run: ./gradlew :library:koverXmlReport
+
+      - name: Parse coverage percentage
+        id: coverage
+        run: |
+          REPORT="library/build/reports/kover/report.xml"
+          if [ -f "$REPORT" ]; then
+            LINE_COVERED=$(grep -o 'type="LINE"[^/]*covered="[0-9]*"' "$REPORT" | head -1 | grep -o 'covered="[0-9]*"' | grep -o '[0-9]*')
+            LINE_MISSED=$(grep -o 'type="LINE"[^/]*missed="[0-9]*"' "$REPORT" | head -1 | grep -o 'missed="[0-9]*"' | grep -o '[0-9]*')
+            TOTAL=$((LINE_COVERED + LINE_MISSED))
+            if [ "$TOTAL" -gt 0 ]; then
+              PERCENT=$((LINE_COVERED * 100 / TOTAL))
+            else
+              PERCENT=0
+            fi
+          else
+            PERCENT=0
+          fi
+          echo "percentage=$PERCENT" >> "$GITHUB_OUTPUT"
+
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ${{ vars.COVERAGE_GIST_ID }}
+          filename: coverage.json
+          label: coverage
+          message: ${{ steps.coverage.outputs.percentage }}%
+          valColorRange: ${{ steps.coverage.outputs.percentage }}
+          minColorRange: 50
+          maxColorRange: 90

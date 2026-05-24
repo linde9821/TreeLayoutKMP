@@ -9,6 +9,7 @@ lets-plot-kotlin = "4.13.0"
 lets-plot = "4.8.2"
 lets-plot-platf = "4.10.1"
 dokka = "2.2.0"
+kover = "0.9.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -23,3 +24,4 @@ vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "
 compose = { id = "org.jetbrains.compose", version.ref = "compose-version" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
