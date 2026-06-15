@@ -5,9 +5,9 @@ android-minSdk = "24"
 android-compileSdk = "36"
 vanniktechMavenPublish = "0.36.0"
 compose-version = "1.11.1"
-lets-plot-kotlin = "4.14.0"
+lets-plot-kotlin = "4.14.1"
 lets-plot = "4.8.2"
-lets-plot-platf = "4.10.1"
+lets-plot-platf = "4.10.3"
 dokka = "2.2.0"
 
 [libraries]
