@@ -1,10 +1,10 @@
 [versions]
-agp = "9.2.1"
-kotlin = "2.4.0"
+agp = "9.3.2"
+kotlin = "2.4.10"
 android-minSdk = "24"
 android-compileSdk = "36"
 vanniktechMavenPublish = "0.37.0"
-compose-version = "1.11.1"
+compose-version = "1.12.0"
 lets-plot-kotlin = "4.15.0"
 lets-plot = "4.8.2"
 lets-plot-platf = "4.11.0"
