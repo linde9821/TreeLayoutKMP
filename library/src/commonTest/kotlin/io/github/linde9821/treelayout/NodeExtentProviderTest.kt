@@ -163,4 +163,24 @@ class NodeExtentProviderTest {
         // Root should be centered over its children
         assertEquals(rootPos.x, (leftPos.x + rightPos.x) / 2f)
     }
+
+    @Test
+    fun deepChainUsesCumulativeLevelOffsets() {
+        val depth = 1_000
+        val tree = StringTreeBuilder().root("n0")
+        for (i in 1..depth) tree.addChild("n${i - 1}", "n$i")
+
+        // Height of level d is d % 3 (0, 1, 2, 0, 1, 2, ...)
+        val heights = (0..depth).associate { "n$it" to (it % 3).toFloat() }
+        val extents = FixedExtentProvider(heights = heights, defaultWidth = 0f)
+        val config = WalkerLayoutConfiguration(verticalDistance = 2f)
+        val result = WalkerTreeLayout(tree.buildAdapter(), config, extents).layout()
+
+        var expected = 0f
+        for (d in 0..depth) {
+            assertEquals(expected, result.getPosition("n$d").y, "Wrong y at depth $d")
+            expected += (d % 3).toFloat() + config.verticalDistance
+        }
+        assertEquals(depth, result.getMaxDepth())
+    }
 }

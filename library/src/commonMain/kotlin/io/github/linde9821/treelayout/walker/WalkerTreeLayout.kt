@@ -4,6 +4,8 @@ import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.UniformNodeExtentProvider
+import io.github.linde9821.treelayout.duplicateNodeError
 import io.github.linde9821.treelayout.result.TreeLayoutResult
 import kotlin.math.max
 
@@ -26,20 +28,17 @@ public class WalkerTreeLayout<T>(
     /**
      * Executes the layout algorithm and returns the result.
      */
-    public fun layout(): TreeLayoutResult<T> {
+    public fun layout(): TreeLayoutResult<T> = layoutWithDepths().first
+
+    /**
+     * Executes the layout and additionally returns the depth of every node,
+     * so callers (e.g. radial layouts) don't need a second tree traversal.
+     */
+    internal fun layoutWithDepths(): Pair<TreeLayoutResult<T>, Map<T, Int>> {
         val ctx = LayoutContext(adapter, configuration, nodeExtentProvider)
         ctx.execute()
-        return ctx.buildResult()
+        return ctx.buildResult() to ctx.depths
     }
-}
-
-/**
- * Default extent provider that returns zero dimensions for all nodes,
- * treating them as dimensionless points for backward compatibility.
- */
-private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
-    override fun width(node: T): Float = 0.0f
-    override fun height(node: T): Float = 0.0f
 }
 
 /**
@@ -61,17 +60,31 @@ private class LayoutContext<T>(
 
     // Precomputed structural info
     private val depthOf = HashMap<T, Int>()
+    val depths: Map<T, Int> get() = depthOf
     private val indexAmongSiblings = HashMap<T, Int>()
     private val childrenOf = HashMap<T, List<T>>()
 
     // Precomputed max height per depth level for vertical positioning
     private val maxHeightAtDepth = HashMap<Int, Float>()
 
+    // Depth-axis offset of each level, computed once so secondWalk stays O(1) per node
+    private lateinit var levelOffset: FloatArray
+
     fun execute() {
         val root = adapter.root()
         initNodes(root, 0)
+        computeLevelOffsets()
         firstWalk(root)
         secondWalk(root, -prelim[root]!!)
+    }
+
+    /** Prefix sum of (max height + vertical gap) over all preceding levels. */
+    private fun computeLevelOffsets() {
+        val levels = maxHeightAtDepth.size
+        levelOffset = FloatArray(levels)
+        for (d in 1 until levels) {
+            levelOffset[d] = levelOffset[d - 1] + maxHeightAtDepth[d - 1]!! + config.verticalDistance
+        }
     }
 
     fun buildResult(): TreeLayoutResult<T> {
@@ -79,6 +92,7 @@ private class LayoutContext<T>(
     }
 
     private fun initNodes(node: T, depth: Int) {
+        if (node in depthOf) duplicateNodeError(depth)
         depthOf[node] = depth
         modifiers[node] = 0f
         threads[node] = null
@@ -202,11 +216,7 @@ private class LayoutContext<T>(
     private fun secondWalk(v: T, m: Float) {
         val depth = depthOf[v]!!
         val across = prelim[v]!! + m
-        // Compute depth-axis position by accumulating max heights of preceding levels + gaps
-        var along = 0f
-        for (d in 0 until depth) {
-            along += maxHeightAtDepth[d]!! + config.verticalDistance
-        }
+        val along = levelOffset[depth]
         positions[v] = when (config.orientation) {
             Orientation.TopToBottom -> Point(across, along)
             Orientation.BottomToTop -> Point(across, -along)

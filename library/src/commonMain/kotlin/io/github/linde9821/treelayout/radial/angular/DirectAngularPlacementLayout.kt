@@ -2,6 +2,7 @@ package io.github.linde9821.treelayout.radial.angular
 
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.duplicateNodeError
 import io.github.linde9821.treelayout.result.TreeLayoutResult
 import kotlin.math.PI
 import kotlin.math.cos
@@ -29,7 +30,7 @@ public class DirectAngularPlacementLayout<T>(
      */
     public fun layout(): TreeLayoutResult<T> {
         val weight = HashMap<T, Int>()
-        computeWeights(adapter.root(), weight)
+        computeWeights(adapter.root(), 0, HashSet(), weight)
 
         val positions = HashMap<T, Point>(weight.size)
         var maxDepth = 0
@@ -63,11 +64,12 @@ public class DirectAngularPlacementLayout<T>(
         return TreeLayoutResult(positions, maxDepth)
     }
 
-    private fun computeWeights(node: T, weight: HashMap<T, Int>): Int {
+    private fun computeWeights(node: T, depth: Int, visited: HashSet<T>, weight: HashMap<T, Int>): Int {
+        if (!visited.add(node)) duplicateNodeError(depth)
         val children = adapter.children(node)
         var w = 1
         for (child in children) {
-            w += computeWeights(child, weight)
+            w += computeWeights(child, depth + 1, visited, weight)
         }
         weight[node] = w
         return w

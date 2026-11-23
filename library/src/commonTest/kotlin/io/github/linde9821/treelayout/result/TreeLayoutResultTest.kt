@@ -22,6 +22,43 @@ class TreeLayoutResultTest {
     }
 
     @Test
+    fun getBoundsWithAllNegativeCoordinates() {
+        val r = result("a" to Point(-10f, -20f), "b" to Point(-4f, -6f))
+        assertEquals(Bounds(-10f, -20f, -4f, -6f), r.getBounds())
+    }
+
+    @Test
+    fun getBoundsSingleNodeAtNegativePosition() {
+        val r = result("a" to Point(-3f, -7f))
+        assertEquals(Bounds(-3f, -7f, -3f, -7f), r.getBounds())
+    }
+
+    @Test
+    fun transformationsWorkWithAllNegativeCoordinates() {
+        val r = result("a" to Point(-10f, -20f), "b" to Point(-4f, -6f))
+
+        val normalized = r.normalized()
+        assertEquals(Point(0f, 0f), normalized.getPosition("a"))
+        assertEquals(Point(6f, 14f), normalized.getPosition("b"))
+
+        // Bounds are 6×14, so fitting into 12×100 scales by 2
+        val scaled = r.scaledTo(12f, 100f)
+        assertEquals(Point(0f, 0f), scaled.getPosition("a"))
+        assertEquals(Point(12f, 28f), scaled.getPosition("b"))
+
+        val centered = r.centered(12f, 100f)
+        assertEquals(Point(0f, 36f), centered.getPosition("a"))
+        assertEquals(Point(12f, 64f), centered.getPosition("b"))
+    }
+
+    @Test
+    fun bottomToTopLayoutHasCorrectBounds() {
+        // BottomToTop produces y <= 0 for every node; root sits at y = 0
+        val r = result("root" to Point(0f, 0f), "child" to Point(0f, -1f))
+        assertEquals(Bounds(0f, -1f, 0f, 0f), r.getBounds())
+    }
+
+    @Test
     fun getBoundsEmptyPositionsReturnsZero() {
         val r = result()
         val b = r.getBounds()

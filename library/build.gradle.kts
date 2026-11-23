@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.github.linde9821"
-version = "0.5.0"
+version = "0.6.0"
 
 dokka {
     moduleName.set("TreeLayoutKMP")
@@ -38,7 +38,7 @@ kotlin {
         }
     }
     android {
-        namespace = "org.github.linde9821.treelayout"
+        namespace = "io.github.linde9821.treelayout"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

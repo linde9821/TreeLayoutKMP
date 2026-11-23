@@ -31,7 +31,7 @@ your nodes; the library computes optimal (x, y) coordinates for every node in th
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("io.github.linde9821:treelayout-kmp:0.5.0")
+    implementation("io.github.linde9821:treelayout-kmp:0.6.0")
 }
 ```
 
@@ -429,6 +429,20 @@ Run the benchmark yourself:
 ```bash
 ./gradlew :benchmark:jvmRun
 ```
+
+## Known Limitations
+
+- **Very deep trees may cause a stack overflow.** All layout algorithms currently traverse the tree recursively, so
+  call-stack usage grows with tree *depth* (not node count). Wide or balanced trees with millions of nodes are fine, but
+  degenerate, list-like trees that are tens of thousands of levels deep can exceed the default stack size — especially
+  on JS/Wasm and Kotlin/Native, where stacks are typically smaller than on the JVM. Replacing the recursion with
+  explicit, heap-allocated stacks is planned.
+
+## Tree Validation
+
+All layouts throw an `IllegalArgumentException` if the adapter reaches the same node twice — i.e. it describes a
+cycle, or a node is shared between multiple parents. See the [identity contract](library/src/commonMain/kotlin/io/github/linde9821/treelayout/TreeAdapter.kt)
+on `TreeAdapter<T>`. Consistency between `children()` and `parent()` is not yet verified.
 
 ## Running the Samples
 

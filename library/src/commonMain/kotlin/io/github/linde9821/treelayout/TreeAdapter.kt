@@ -33,3 +33,17 @@ public interface TreeAdapter<T> {
     /** Returns true if [node] has no children. */
     public fun isLeaf(node: T): Boolean = children(node).isEmpty()
 }
+
+/**
+ * Throws if a node is reached a second time during traversal, which means the adapter
+ * describes a cycle or shares a node between multiple parents.
+ *
+ * The node itself is intentionally not included in the message: calling `toString()` on a
+ * node that is part of a reference cycle (e.g. a data class) could itself recurse forever.
+ */
+internal fun duplicateNodeError(depth: Int): Nothing =
+    throw IllegalArgumentException(
+        "Invalid tree: a node at depth $depth was reached more than once. " +
+            "The TreeAdapter describes a cycle or a node shared between multiple parents; " +
+            "each node must appear exactly once in the tree."
+    )

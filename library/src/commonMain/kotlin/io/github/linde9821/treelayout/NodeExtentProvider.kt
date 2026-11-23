@@ -13,3 +13,12 @@ public interface NodeExtentProvider<T> {
     /** Returns the height of [node]. */
     public fun height(node: T): Float
 }
+
+/**
+ * Default extent provider that returns zero dimensions for all nodes,
+ * treating them as dimensionless points.
+ */
+internal class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
+    override fun width(node: T): Float = 0.0f
+    override fun height(node: T): Float = 0.0f
+}
