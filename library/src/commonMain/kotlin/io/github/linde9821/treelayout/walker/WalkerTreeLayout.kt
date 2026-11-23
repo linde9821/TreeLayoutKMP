@@ -67,11 +67,24 @@ private class LayoutContext<T>(
     // Precomputed max height per depth level for vertical positioning
     private val maxHeightAtDepth = HashMap<Int, Float>()
 
+    // Depth-axis offset of each level, computed once so secondWalk stays O(1) per node
+    private lateinit var levelOffset: FloatArray
+
     fun execute() {
         val root = adapter.root()
         initNodes(root, 0)
+        computeLevelOffsets()
         firstWalk(root)
         secondWalk(root, -prelim[root]!!)
+    }
+
+    /** Prefix sum of (max height + vertical gap) over all preceding levels. */
+    private fun computeLevelOffsets() {
+        val levels = maxHeightAtDepth.size
+        levelOffset = FloatArray(levels)
+        for (d in 1 until levels) {
+            levelOffset[d] = levelOffset[d - 1] + maxHeightAtDepth[d - 1]!! + config.verticalDistance
+        }
     }
 
     fun buildResult(): TreeLayoutResult<T> {
@@ -202,11 +215,7 @@ private class LayoutContext<T>(
     private fun secondWalk(v: T, m: Float) {
         val depth = depthOf[v]!!
         val across = prelim[v]!! + m
-        // Compute depth-axis position by accumulating max heights of preceding levels + gaps
-        var along = 0f
-        for (d in 0 until depth) {
-            along += maxHeightAtDepth[d]!! + config.verticalDistance
-        }
+        val along = levelOffset[depth]
         positions[v] = when (config.orientation) {
             Orientation.TopToBottom -> Point(across, along)
             Orientation.BottomToTop -> Point(across, -along)
