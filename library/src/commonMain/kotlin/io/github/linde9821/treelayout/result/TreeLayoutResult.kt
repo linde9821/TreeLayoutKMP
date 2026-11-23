@@ -29,10 +29,11 @@ public class TreeLayoutResult<T>(
     public fun getBounds(): Bounds {
         val values = positions.values
         if (values.isEmpty()) return Bounds(0f, 0f, 0f, 0f)
-        var minX = Float.MAX_VALUE
-        var minY = Float.MAX_VALUE
-        var maxX = Float.MIN_VALUE
-        var maxY = Float.MIN_VALUE
+        var minX = Float.POSITIVE_INFINITY
+        var minY = Float.POSITIVE_INFINITY
+        // Note: Float.MIN_VALUE is the smallest *positive* float, not the most negative one
+        var maxX = Float.NEGATIVE_INFINITY
+        var maxY = Float.NEGATIVE_INFINITY
         for (p in values) {
             if (p.x < minX) minX = p.x
             if (p.y < minY) minY = p.y
