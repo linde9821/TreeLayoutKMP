@@ -4,6 +4,7 @@ import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.duplicateNodeError
 import io.github.linde9821.treelayout.result.TreeLayoutResult
 import kotlin.math.max
 
@@ -92,6 +93,7 @@ private class LayoutContext<T>(
     }
 
     private fun initNodes(node: T, depth: Int) {
+        if (node in depthOf) duplicateNodeError(depth)
         depthOf[node] = depth
         modifiers[node] = 0f
         threads[node] = null
