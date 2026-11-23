@@ -261,3 +261,5 @@ gradle.properties_local
 /shelf/
 /workspace.xml
 sample/android/.idea/
+# Android SDK location (machine-specific)
+local.properties

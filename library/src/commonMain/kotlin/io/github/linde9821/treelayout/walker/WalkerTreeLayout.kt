@@ -4,6 +4,7 @@ import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Orientation
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.UniformNodeExtentProvider
 import io.github.linde9821.treelayout.duplicateNodeError
 import io.github.linde9821.treelayout.result.TreeLayoutResult
 import kotlin.math.max
@@ -27,20 +28,17 @@ public class WalkerTreeLayout<T>(
     /**
      * Executes the layout algorithm and returns the result.
      */
-    public fun layout(): TreeLayoutResult<T> {
+    public fun layout(): TreeLayoutResult<T> = layoutWithDepths().first
+
+    /**
+     * Executes the layout and additionally returns the depth of every node,
+     * so callers (e.g. radial layouts) don't need a second tree traversal.
+     */
+    internal fun layoutWithDepths(): Pair<TreeLayoutResult<T>, Map<T, Int>> {
         val ctx = LayoutContext(adapter, configuration, nodeExtentProvider)
         ctx.execute()
-        return ctx.buildResult()
+        return ctx.buildResult() to ctx.depths
     }
-}
-
-/**
- * Default extent provider that returns zero dimensions for all nodes,
- * treating them as dimensionless points for backward compatibility.
- */
-private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
-    override fun width(node: T): Float = 0.0f
-    override fun height(node: T): Float = 0.0f
 }
 
 /**
@@ -62,6 +60,7 @@ private class LayoutContext<T>(
 
     // Precomputed structural info
     private val depthOf = HashMap<T, Int>()
+    val depths: Map<T, Int> get() = depthOf
     private val indexAmongSiblings = HashMap<T, Int>()
     private val childrenOf = HashMap<T, List<T>>()
 

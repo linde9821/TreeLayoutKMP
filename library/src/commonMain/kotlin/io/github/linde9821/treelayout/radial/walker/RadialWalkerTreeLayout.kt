@@ -3,6 +3,7 @@ package io.github.linde9821.treelayout.radial.walker
 import io.github.linde9821.treelayout.NodeExtentProvider
 import io.github.linde9821.treelayout.Point
 import io.github.linde9821.treelayout.TreeAdapter
+import io.github.linde9821.treelayout.UniformNodeExtentProvider
 import io.github.linde9821.treelayout.result.TreeLayoutResult
 import io.github.linde9821.treelayout.walker.WalkerLayoutConfiguration
 import io.github.linde9821.treelayout.walker.WalkerTreeLayout
@@ -37,14 +38,11 @@ public class RadialWalkerTreeLayout<T>(
             horizontalDistance = 1.0f,
             verticalDistance = configuration.layerDistance,
         )
-        val linearResult = WalkerTreeLayout(adapter, walkerConfig, nodeExtentProvider).layout()
+        val (linearResult, depthOf) = WalkerTreeLayout(adapter, walkerConfig, nodeExtentProvider).layoutWithDepths()
         val linearPositions = linearResult.getPositions()
 
-        val depthOf = HashMap<T, Int>(linearPositions.size)
-        computeDepths(adapter.root(), 0, depthOf)
-
-        var xMin = Float.MAX_VALUE
-        var xMax = Float.MIN_VALUE
+        var xMin = Float.POSITIVE_INFINITY
+        var xMax = Float.NEGATIVE_INFINITY
         for ((_, pos) in linearPositions) {
             xMin = min(xMin, pos.x)
             xMax = max(xMax, pos.x)
@@ -72,16 +70,4 @@ public class RadialWalkerTreeLayout<T>(
 
         return TreeLayoutResult(radialPositions, linearResult.getMaxDepth())
     }
-
-    private fun computeDepths(node: T, depth: Int, depthOf: HashMap<T, Int>) {
-        depthOf[node] = depth
-        for (child in adapter.children(node)) {
-            computeDepths(child, depth + 1, depthOf)
-        }
-    }
-}
-
-private class UniformNodeExtentProvider<T> : NodeExtentProvider<T> {
-    override fun width(node: T): Float = 0.0f
-    override fun height(node: T): Float = 0.0f
 }
