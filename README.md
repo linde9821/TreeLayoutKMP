@@ -430,6 +430,17 @@ Run the benchmark yourself:
 ./gradlew :benchmark:jvmRun
 ```
 
+## Known Limitations
+
+- **Very deep trees may cause a stack overflow.** All layout algorithms currently traverse the tree recursively, so
+  call-stack usage grows with tree *depth* (not node count). Wide or balanced trees with millions of nodes are fine, but
+  degenerate, list-like trees that are tens of thousands of levels deep can exceed the default stack size — especially
+  on JS/Wasm and Kotlin/Native, where stacks are typically smaller than on the JVM. Replacing the recursion with
+  explicit, heap-allocated stacks is planned.
+- **Malformed trees are not validated.** An adapter that produces a cycle (e.g. a node listed as its own descendant)
+  results in infinite recursion rather than a descriptive error. See the [identity contract](library/src/commonMain/kotlin/io/github/linde9821/treelayout/TreeAdapter.kt)
+  on `TreeAdapter<T>`.
+
 ## Running the Samples
 
 The `sample/` module is a Compose Multiplatform application that visualizes a **prefix tree** built from user-provided
